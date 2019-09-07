@@ -3,17 +3,13 @@ package com.example.girlswing.UI;
 import com.example.girlswing.services.LoginService;
 import com.example.girlswing.services.MainPageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.IOException;
 
 import static javax.swing.GroupLayout.Alignment.CENTER;
 

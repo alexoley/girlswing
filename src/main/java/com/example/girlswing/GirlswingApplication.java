@@ -4,10 +4,16 @@ import com.example.girlswing.UI.LoginForm;
 import com.example.girlswing.UI.LoginPage;
 import mdlaf.MaterialLookAndFeel;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.embedded.EmbeddedWebServerFactoryCustomizerAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
+import org.springframework.boot.autoconfigure.websocket.servlet.WebSocketServletAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
@@ -18,7 +24,11 @@ import java.awt.*;
 
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class,
 		HibernateJpaAutoConfiguration.class,
-		DataSourceTransactionManagerAutoConfiguration.class })
+		DataSourceTransactionManagerAutoConfiguration.class,
+		WebMvcAutoConfiguration.class,
+        SpringDataWebAutoConfiguration.class,
+        EmbeddedWebServerFactoryCustomizerAutoConfiguration.class,
+        WebSocketServletAutoConfiguration.class})
 @EnableTransactionManagement
 public class GirlswingApplication{
 
