@@ -63,10 +63,12 @@ public class ExternalDBConfig {
         factory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 
         Properties jpaProperties = new Properties();
-        jpaProperties.put("hibernate.hbm2ddl.auto", env.getProperty("spring.jpa.hibernate.ddl-auto"));
+        //jpaProperties.put("hibernate.hbm2ddl.auto", env.getProperty("spring.jpa.hibernate.ddl-auto"));
         jpaProperties.put("hibernate.show-sql", env.getProperty("spring.jpa.show-sql"));
         jpaProperties.put("hibernate.dialect",
                 env.getProperty("spring.jpa.properties.hibernate.dialect.2"));
+        jpaProperties.put("hibernate.jdbc.lob.non_contextual_creation",
+                env.getProperty("spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation"));
         factory.setJpaProperties(jpaProperties);
 
         return factory;

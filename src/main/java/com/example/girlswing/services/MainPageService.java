@@ -2,15 +2,14 @@ package com.example.girlswing.services;
 
 
 import com.example.girlswing.UI.MainPage;
-import com.example.girlswing.utils.CookiePrime;
+import com.example.girlswing.utils.CookieP;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
-import org.apache.http.HttpResponse;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -18,12 +17,14 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@Slf4j
 public class MainPageService {
 
-    Logger logger = LoggerFactory.getLogger(MainPageService.class);
+    @Value("${site.api.link:}")
+    private String siteApiLink;
 
     @Autowired
-    CookiePrime cookiePrime;
+    CookieP cookieP;
 
     @Autowired
     RequestService requestService;
@@ -34,6 +35,12 @@ public class MainPageService {
     @Autowired
     LoginService loginService;
 
+    @Autowired
+    ResponseService responseService;
+
+    @Autowired
+    ManService manService;
+
     public void sendOld(String idTo, String text){
         Date date = new Date();
         Long timeMilis = date.getTime();
@@ -41,7 +48,7 @@ public class MainPageService {
                 RequestBody.create(MediaType.parse("application/json"),
                         "{\"idUserTo\":"+idTo+",\"idMale\":36661269,\"idFemale\":20399816," +
                                 "\"content\":{\"message\":\""+text+"\",\"id\":"+timeMilis.toString()+"}}" ))
-                .url(HttpUrl.parse("https://api.prime.date/operator/add-activity/message/"+idTo))
+                .url(HttpUrl.parse(siteApiLink+"/operator/add-activity/message/"+idTo))
                 .build();
         //OkHttpClient httpClient = new OkHttpClient();
         try
@@ -53,12 +60,12 @@ public class MainPageService {
                     .execute();
             if(response.isSuccessful())
             {
-                logger.debug(response.body().string());
+                log.debug(response.body().string());
                 //response.body().
             }
             else
             {
-                logger.info(response.body().string());
+                log.info(response.body().string());
             }
         }
         catch (IOException e1)
@@ -67,28 +74,10 @@ public class MainPageService {
         }
     }
 
-    public HttpResponse send(String idTo, String text){
-        return send(idTo, text, "");
-    }
-
-    //@Async
-    public HttpResponse send(String idTo, String text, String userAgent){
-        Date date = new Date();
-        Long timeMilis = date.getTime();
-        String json = new JSONObject()
-                .put("idUserTo", idTo)
-                .put("idMale", idTo)
-                .put("idFemale", "20399816")
-                .put("content", new JSONObject().put("message", text).put("id", timeMilis.toString())).toString();
-
-        return requestService.basicRequest(json,
-                "https://api.prime.date/operator/add-activity/message/"+idTo,
-                true, userAgent);
-    }
 
     public void sendToAll(String text){
         long startTime = System.currentTimeMillis();
-        Queue<String> menIds = requestService.getMenIds();
+        Queue<String> menIds = manService.getMenIds();
         long endTime = System.currentTimeMillis();
 
         Long duration = (endTime - startTime);
@@ -96,8 +85,8 @@ public class MainPageService {
         Long min = sec/60;
         Long secAtTheEnd = sec % 60;
 
-        logger.debug("time of mining: "+min.toString()+"min "+secAtTheEnd.toString()+"sec");
-        logger.debug("list count:"+ menIds.size());
+        log.debug("time of mining: "+min.toString()+"min "+secAtTheEnd.toString()+"sec");
+        log.debug("list count:"+ menIds.size());
 
         /*startTime = System.currentTimeMillis();
         //mainPage.setBar2Max(menIds.size());
@@ -124,7 +113,7 @@ public class MainPageService {
                     Long secTen = durationTen/1000;
                     Long minTen = secTen/60;
                     Long secAtTheEndTen = secTen % 60;
-                    logger.debug("Time of sending first "+i+" :"
+                    log.debug("Time of sending first "+i+" :"
                             +minTen.toString()+"min "
                             +secAtTheEndTen.toString()+"sec");
                 }
@@ -135,7 +124,7 @@ public class MainPageService {
                     Thread.sleep(3L * 1000L);
                 }
                 catch (InterruptedException e){
-                    logger.error("InterruptedException while thread wait for rate limit increase");
+                    log.error("InterruptedException while thread wait for rate limit increase");
                 }
                 //requestService.isMessageResponseOk(loginService.logout());
                 //requestService.isMessageResponseOk(loginService.login("", ""));
@@ -148,7 +137,7 @@ public class MainPageService {
         min = sec/60;
         secAtTheEnd = sec % 60;
 
-        logger.debug("time of sending: "+min.toString()+"min "+secAtTheEnd.toString()+"sec");*/
+        log.debug("time of sending: "+min.toString()+"min "+secAtTheEnd.toString()+"sec");*/
 
     }
 
@@ -165,9 +154,9 @@ public class MainPageService {
                 .put("offset", 0)
                 .put("type", "operatorchat").toString();
 
-        String responseText = requestService.returnResponseBodyString(requestService.basicRequest(json,
-                "https://api.prime.date/connections/get",
-                true));
+        String responseText = responseService.returnResponseBodyString(requestService.basicRequest(json,
+                siteApiLink+"/connections/get",
+                true, "post"));
 
         try {
             int i=0;
@@ -180,7 +169,7 @@ public class MainPageService {
                     }
                 }
             }
-            logger.debug("Entry of message in chat: "+i);
+            log.debug("Entry of message in chat: "+i);
         }
         catch(Exception e){
             e.printStackTrace();

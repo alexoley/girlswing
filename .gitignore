@@ -3,6 +3,10 @@ target/
 /mvn/**
 !**/src/main/**
 !**/src/test/**
+*.log
+*.gz
+*.bat
+*.sh
 
 ### STS ###
 .apt_generated

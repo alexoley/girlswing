@@ -18,19 +18,17 @@ import java.util.Date;
 public class Man {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    //@GeneratedValue(strategy= GenerationType.SEQUENCE, generator="qid_seq")
-    //@SequenceGenerator(name = "qid_seq", sequenceName="questions_id_seq")
     @Column(name = "id")
     private Long id;
 
     @Column(name = "id_user")
-    private int id_user;
+    private long id_user;
 
     @Column(name = "name")
     private String name;
 
     @Column(name = "age")
-    private int age;
+    private String age;
 
     @Column(name = "gender")
     private String gender;
@@ -44,7 +42,7 @@ public class Man {
     @Column(name = "occupation", columnDefinition="TEXT")
     private String occupation;
 
-    @Column(name = "looking_for")
+    @Column(name = "looking_for", columnDefinition="TEXT")
     private String looking_for;
 
     @Column(name = "avatar_xxs")
@@ -69,4 +67,8 @@ public class Man {
     @Temporal(TemporalType.DATE)
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date last_visit;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable=false)
+    private Search searchId;
 }

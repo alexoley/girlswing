@@ -1,6 +1,9 @@
 package com.example.girlswing.UI;
 
+import com.example.girlswing.exceptions.GirlswingContextInitializeException;
+import com.example.girlswing.exceptions.LoginException;
 import com.example.girlswing.services.LoginService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import javax.swing.*;
@@ -11,6 +14,7 @@ import static javax.swing.GroupLayout.Alignment.CENTER;
 
 
 @Component
+@Slf4j
 public class LoginPage extends JFrame{
 
     @Autowired
@@ -18,6 +22,10 @@ public class LoginPage extends JFrame{
 
     @Autowired
     LoginService loginService;
+
+    @Autowired
+    MainForm mainForm;
+
 
     public LoginPage() {
         initUI();
@@ -27,8 +35,8 @@ public class LoginPage extends JFrame{
 
         JButton quitButton = new JButton("Quit");
         JButton loginButton = new JButton("Login");
-        JTextField usernameField = new JTextField("Username");
-        JTextField passwordField = new JTextField("Password");
+        JTextField emailField = new JTextField("Email");
+        JPasswordField passwordField = new JPasswordField("Password");
         JProgressBar menIds = new JProgressBar();
         JProgressBar sendToMenIds = new JProgressBar();
 
@@ -43,15 +51,29 @@ public class LoginPage extends JFrame{
         });
 
         loginButton.addActionListener((ActionEvent event)  -> {
-            loginService.login(usernameField.getText(), passwordField.getText());
-            this.setVisible(false);
-            mainPage.setVisible(true);
-            mainPage.setSize(this.getSize());
-            mainPage.setLocation(this.getLocation());
-            this.dispose();
+            try {
+                String pass = new String(passwordField.getPassword());
+                loginService.applicationLogin(emailField.getText(), pass);
+                this.setVisible(false);
+                mainPage.setVisible(true);
+                mainPage.setSize(this.getSize());
+                mainPage.setLocation(this.getLocation());
+
+                mainForm.setVisible(true);
+
+                this.dispose();
+            }
+            catch(LoginException e){
+                JOptionPane.showMessageDialog(this,"Incorrect login or password",
+                        "Error",JOptionPane.ERROR_MESSAGE);
+                log.error(e.getMessage());
+            }
+            catch(GirlswingContextInitializeException e){
+                log.error(e.getMessage());
+            }
         });
 
-        createLayout(usernameField,passwordField,loginButton,quitButton, menIds);
+        createLayout(emailField,passwordField,loginButton,quitButton, menIds);
 
         setTitle("Login Page");
         setSize(600, 400);
