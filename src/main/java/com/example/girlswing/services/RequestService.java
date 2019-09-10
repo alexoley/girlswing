@@ -57,7 +57,7 @@ public class RequestService {
                 log.error("Forget give method name parameter(for example GET, POST, PUT...) in method basicRequest");
             }
             if("get".equalsIgnoreCase(method)){
-                request = new HttpGet();
+                request = new HttpGet(url);
             }
             if("post".equalsIgnoreCase(method) || "put".equalsIgnoreCase(method) || "delete".equalsIgnoreCase(method)){
                 if("post".equalsIgnoreCase(method))
@@ -70,9 +70,10 @@ public class RequestService {
                     StringEntity entity = new StringEntity(bodyJson);
                     ((HttpEntityEnclosingRequestBase)request).setEntity(entity);
                 }
+                request.setHeader("Accept", "application/json");
+                request.setHeader("Content-type", "application/json");
             }
-            request.setHeader("Accept", "application/json");
-            request.setHeader("Content-type", "application/json");
+
             if(setCookie) {
                 request.setHeader("Cookie", "__cfduid=" + (String) cookieP.get("__cfduid") +
                         ";token=" + (String) cookieP.get("token") +
@@ -119,6 +120,36 @@ public class RequestService {
     public HttpResponse findFemale(){
         return basicRequest(
                 siteApiLink+"/operator/find-females",
+                true, "post");
+    }
+
+    public HttpResponse getDictionaries(){
+        return basicRequest(
+                siteApiLink+"/system/dictionary?dictionary=1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,21",
+                true, "get");
+    }
+
+    public HttpResponse getConnections(int onliners, int offset){
+        return getConnections(onliners, offset, "");
+    }
+
+    public HttpResponse getConnections(int onliners, int offset, String cursor){
+        JSONObject jsonObject = new JSONObject()
+                .put("limit", 50)
+                .put("offset", offset)
+                .put("type", "operatorchat")
+                .put("criteria", new JSONObject().put("filters",
+                        new JSONObject().put("id_dialog", 0)
+                                .put("id_female", "null")
+                                .put("bookmarked", 0)
+                                .put("nomessages", 0)
+                                .put("unanswered", 0)
+                                .put("onliners", onliners)));
+        if(!cursor.isEmpty()){
+            jsonObject.put("cursor",cursor);
+        }
+        return basicRequest(jsonObject.toString(),
+                siteApiLink+"/connections/get",
                 true, "post");
     }
 

@@ -1,5 +1,7 @@
 package com.example.girlswing.UI;
 
+import com.example.girlswing.services.ChatSendFormService;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import mdlaf.animation.MaterialUIMovement;
 import mdlaf.utils.MaterialBorders;
@@ -20,6 +22,11 @@ public class ChatSendForm extends JFrame {
 
     @Autowired
     MainForm mainForm;
+
+    @Autowired
+    ChatSendFormService chatSendFormService;
+
+    private JComboBox country, lastOnline, education, maritialStatus, children, bodyType, religion, drinking, smoking;
 
     ChatSendForm(){
         try {
@@ -54,28 +61,91 @@ public class ChatSendForm extends JFrame {
         JPanel filters = new JPanel();
         JPanel agePanel = new JPanel();
 
+        JPanel countryPanel = new JPanel();
+        JPanel lastOnlinePanel = new JPanel();
+        JPanel educationPanel = new JPanel();
+        JPanel maritialStatusPanel = new JPanel();
+        JPanel childrenPanel = new JPanel();
+        JPanel bodyTypePanel = new JPanel();
+        JPanel religionPanel = new JPanel();
+        JPanel drinkingPanel = new JPanel();
+        JPanel smokingPanel = new JPanel();
+
+        JLabel ageLabel = new JLabel("Age");
+        JLabel countryLabel = new JLabel("Country");
+        JLabel lastOnlineLabel = new JLabel("Last online");
+        JLabel educationLabel = new JLabel("Education");
+        JLabel maritialStatusLabel = new JLabel("Maritial Status");
+        JLabel childrenLabel = new JLabel("Children");
+        JLabel bodyTypeLabel = new JLabel("Body Type");
+        JLabel religionLabel = new JLabel("Religion");
+        JLabel drinkingLabel = new JLabel("Drinking");
+        JLabel smokingLabel = new JLabel("Smoking");
+
+
         JSpinner ageFrom = new JSpinner(new SpinnerNumberModel(1, 1, 200, 1));
         JSpinner ageTo = new JSpinner(new SpinnerNumberModel(100, 1, 200, 1));
-        JComboBox country = new JComboBox();
-        JComboBox lastOnline = new JComboBox();
-        JComboBox education = new JComboBox();
-        JComboBox maritialStatus = new JComboBox();
-        JComboBox children = new JComboBox();
-        JComboBox bodyType = new JComboBox();
-        JComboBox religion = new JComboBox();
-        JComboBox drinking = new JComboBox();
-        drinking.setToolTipText("Drinking");
-        JComboBox smoking = new JComboBox();
+        country = new JComboBox();
+        lastOnline = new JComboBox();
+        education = new JComboBox();
+        maritialStatus = new JComboBox();
+        children = new JComboBox();
+        bodyType = new JComboBox();
+        religion = new JComboBox();
+        drinking = new JComboBox();
+        smoking = new JComboBox();
         JCheckBox withPhoto = new JCheckBox("With Photo");
         JCheckBox wantsMoreChildren = new JCheckBox("Wants More Children");
 
+        //add labels to filter panels
+        countryPanel.add(countryLabel, BorderLayout.NORTH);
+        lastOnlinePanel.add(lastOnlineLabel, BorderLayout.NORTH);
+        educationPanel.add(educationLabel, BorderLayout.NORTH);
+        maritialStatusPanel.add(maritialStatusLabel, BorderLayout.NORTH);
+        childrenPanel.add(childrenLabel, BorderLayout.NORTH);
+        bodyTypePanel.add(bodyTypeLabel, BorderLayout.NORTH);
+        religionPanel.add(religionLabel, BorderLayout.NORTH);
+        drinkingPanel.add(drinkingLabel, BorderLayout.NORTH);
+        smokingPanel.add(smokingLabel, BorderLayout.NORTH);
+        agePanel.add(ageLabel, BorderLayout.NORTH);
+
+
+
+
+        //add comboBoxes to filter panels
+        countryPanel.add(country);
+        lastOnlinePanel.add(lastOnline);
+        educationPanel.add(education);
+        maritialStatusPanel.add(maritialStatus);
+        childrenPanel.add(children);
+        bodyTypePanel.add(bodyType);
+        religionPanel.add(religion);
+        drinkingPanel.add(drinking);
+        smokingPanel.add(smoking);
+
+
         agePanel.add(ageFrom); agePanel.add(ageTo);
-        filters.add(agePanel); filters.add(country); filters.add(lastOnline); filters.add(education);
-        filters.add(maritialStatus); filters.add(children); filters.add(bodyType); filters.add(religion);
-        filters.add(drinking); filters.add(smoking); filters.add(withPhoto); filters.add(wantsMoreChildren);
+        filters.add(agePanel); filters.add(countryPanel); filters.add(lastOnlinePanel); filters.add(educationPanel);
+        filters.add(maritialStatusPanel); filters.add(childrenPanel); filters.add(bodyTypePanel);
+        filters.add(religionPanel); filters.add(drinkingPanel); filters.add(smokingPanel);
+        filters.add(withPhoto); filters.add(wantsMoreChildren);
 
         filters.setLayout(new GridLayout(4,3));
         filters.setBounds(30, 10, 600, 400);
         return filters;
     }
+
+    public void setValuesToFilters(){
+        JsonNode jsonNode = chatSendFormService.getFilterValues();
+        chatSendFormService.fillFilterComboBoxWithItemFromJsonNode(jsonNode, country, "3");
+        chatSendFormService.fillFilterComboBoxWithItemFromJsonNode(jsonNode, lastOnline, "2");
+        chatSendFormService.fillFilterComboBoxWithItemFromJsonNode(jsonNode, education, "6");
+        chatSendFormService.fillFilterComboBoxWithItemFromJsonNode(jsonNode, maritialStatus, "5");
+        chatSendFormService.fillFilterComboBoxWithItemFromJsonNode(jsonNode, children, "17");
+        chatSendFormService.fillFilterComboBoxWithItemFromJsonNode(jsonNode, bodyType, "4");
+        chatSendFormService.fillFilterComboBoxWithItemFromJsonNode(jsonNode, religion, "7");
+        chatSendFormService.fillFilterComboBoxWithItemFromJsonNode(jsonNode, drinking, "9");
+        chatSendFormService.fillFilterComboBoxWithItemFromJsonNode(jsonNode, smoking, "8");
+    }
+
 }

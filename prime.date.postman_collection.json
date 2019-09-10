@@ -1,0 +1,966 @@
+{
+	"info": {
+		"_postman_id": "8b93e6ac-c4e1-4e3e-a419-96237c421b7e",
+		"name": "prime.date",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "programmersndc@gmail.com",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "nv837hnch8c7c3hi47",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://api.prime.date/auth/login",
+					"protocol": "https",
+					"host": [
+						"api",
+						"prime",
+						"date"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "searchMen",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"filters\": {\n        \"ageFrom\": null,\n        \"ageTo\": null,\n        \"countries\": [\n            \"2361809\"\n        ],\n        \"withPhoto\": true,\n        \"moreChildren\": true,\n        \"countChildren\": 3,\n        \"drinking\": 2,\n        \"religion\": \"buddhism\",\n        \"marital_status\": \"divorced\",\n        \"lastOnline\": 3,\n        \"body_type\": \"above_avarage\",\n        \"smoking\": 2,\n        \"education\": \"below_high_school\"\n    },\n    \"limit\": 15,\n    \"page\": 1\n}"
+				},
+				"url": {
+					"raw": "https://api.prime.date/account/search",
+					"protocol": "https",
+					"host": [
+						"api",
+						"prime",
+						"date"
+					],
+					"path": [
+						"account",
+						"search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "connectionProfiles",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"ids\": [\n        12017167,\n        20399816\n    ]\n}"
+				},
+				"url": {
+					"raw": "https://api.prime.date/connections/profiles",
+					"protocol": "https",
+					"host": [
+						"api",
+						"prime",
+						"date"
+					],
+					"path": [
+						"connections",
+						"profiles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "connectionGet",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"criteria\": {\n        \"filters\": {\n            \"id_dialog\": 0,\n            \"id_female\": null,\n            \"bookmarked\": 0,\n            \"nomessages\": 0,\n            \"unanswered\": 0,\n            \"onliners\": 0\n        }\n    },\n    \"limit\": 50,\n    \"offset\": 0,\n    \"type\": \"operatorchat\"\n}"
+				},
+				"url": {
+					"raw": "https://api.prime.date/connections/get",
+					"protocol": "https",
+					"host": [
+						"api",
+						"prime",
+						"date"
+					],
+					"path": [
+						"connections",
+						"get"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "findFemales",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://api.prime.date/operator/find-females",
+					"protocol": "https",
+					"host": [
+						"api",
+						"prime",
+						"date"
+					],
+					"path": [
+						"operator",
+						"find-females"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getMale",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "https://api.prime.date/operator/get-male/33926526",
+					"protocol": "https",
+					"host": [
+						"api",
+						"prime",
+						"date"
+					],
+					"path": [
+						"operator",
+						"get-male",
+						"33926526"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "dictionary",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "dictionary\t1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,21"
+				},
+				"url": {
+					"raw": "https://api.prime.date/system/dictionary?dictionary=1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,21",
+					"protocol": "https",
+					"host": [
+						"api",
+						"prime",
+						"date"
+					],
+					"path": [
+						"system",
+						"dictionary"
+					],
+					"query": [
+						{
+							"key": "dictionary",
+							"value": "1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,21"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mirrors(men sites)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "dictionary\t1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,21"
+				},
+				"url": {
+					"raw": "https://api.prime.date/system/mirrors",
+					"protocol": "https",
+					"host": [
+						"api",
+						"prime",
+						"date"
+					],
+					"path": [
+						"system",
+						"mirrors"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "female",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "id=0"
+				},
+				"url": {
+					"raw": "https://api.prime.date/female/list?id=0",
+					"protocol": "https",
+					"host": [
+						"api",
+						"prime",
+						"date"
+					],
+					"path": [
+						"female",
+						"list"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getConnections",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"criteria\": {\n        \"filters\": {\n            \"id_dialog\": 0,\n            \"id_female\": null,\n            \"bookmarked\": 0,\n            \"nomessages\": 0,\n            \"unanswered\": 0,\n            \"onliners\": 0\n        }\n    },\n    \"limit\": 100,\n    \"offset\": 0,\n    \"type\": \"operatorchat\"\n}\n"
+				},
+				"url": {
+					"raw": "https://api.prime.date/connections/get",
+					"protocol": "https",
+					"host": [
+						"api",
+						"prime",
+						"date"
+					],
+					"path": [
+						"connections",
+						"get"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "sendMessage",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "cbfbc75f-3d73-4432-ada7-ed03921b2404",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"idUserTo\": 12017167,\n    \"idMale\": 12017167,\n    \"idFemale\": 20399816,\n    \"content\": {\n        \"message\": \"How are you?\",\n        \"id\": {{$timestamp}}\n    }\n}"
+				},
+				"url": {
+					"raw": "https://api.prime.date/operator/add-activity/message/12017167",
+					"protocol": "https",
+					"host": [
+						"api",
+						"prime",
+						"date"
+					],
+					"path": [
+						"operator",
+						"add-activity",
+						"message",
+						"12017167"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "sendMail",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "cbfbc75f-3d73-4432-ada7-ed03921b2404",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": {\n        \"content\": \"Tell me about yourself. Please. I am highly organized. I'm a people-person. I'm a natural leader. I am results-oriented. And I am also an excellent communicator.\",\n        \"from\": 20399816,\n        \"to\": 12017167,\n        \"title\": \"\"\n    },\n    \"images\": [\n        {\n            \"id\": \"405106077\",\n            \"id_email\": null,\n            \"url_original\": \"https://i.gstatvb.com/shpzkl6a14p74p4r8.292e8ed4.jpg\",\n            \"url_uploaded\": \"https://i.gstatvb.com/shpzkl6a14p74p4r8.r100x100.15388245.jpg\",\n            \"url_preview\": \"https://i.gstatvb.com/shpzkl6a14p74p4r8.r50x50.8e5cc063.jpg\",\n            \"url_standart\": \"https://i.gstatvb.com/shpzkl6a14p74p4r8.r800x800.233a8e2e.jpg\",\n            \"date_created\": \"2019-08-29 12:47:17\",\n            \"id_user\": \"20399816\",\n            \"url_thumbnail\": \"https://i.gstatvb.com/shpzkl6a14p74p4r8.r100x100.15388245.jpg\",\n            \"full_size\": \"https://i.gstatvb.com/shpzkl6a14p74p4r8.292e8ed4.jpg\",\n            \"type\": \"photo\",\n            \"id_status\": 0\n        }\n    ],\n    \"videos\": []\n}"
+				},
+				"url": {
+					"raw": "https://api.prime.date/correspondence/send",
+					"protocol": "https",
+					"host": [
+						"api",
+						"prime",
+						"date"
+					],
+					"path": [
+						"correspondence",
+						"send"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mailHistory",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "cbfbc75f-3d73-4432-ada7-ed03921b2404",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"page\": 1,\n    \"limit\": 8,\n    \"id_interlocutor\": 12017167,\n    \"id_user\": 20399816\n}"
+				},
+				"url": {
+					"raw": "https://api.prime.date/correspondence/history",
+					"protocol": "https",
+					"host": [
+						"api",
+						"prime",
+						"date"
+					],
+					"path": [
+						"correspondence",
+						"history"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "uploadImage",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "cbfbc75f-3d73-4432-ada7-ed03921b2404",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/alex/Desktop/hi.jfif"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://i.gstatvb.com/upload.php?app=shpzkl&sign=549a3e56",
+					"protocol": "https",
+					"host": [
+						"i",
+						"gstatvb",
+						"com"
+					],
+					"path": [
+						"upload.php"
+					],
+					"query": [
+						{
+							"key": "app",
+							"value": "shpzkl"
+						},
+						{
+							"key": "sign",
+							"value": "549a3e56"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "uploadVideo(why don't work)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "cbfbc75f-3d73-4432-ada7-ed03921b2404",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/alex/Downloads/Pexels Videos 2335977.mp4"
+						},
+						{
+							"key": "key",
+							"value": "e992fa73-7170-48b4-9121-e0a76cbdbadb/${filename}",
+							"type": "text"
+						},
+						{
+							"key": "Content-Type",
+							"value": "video/mp4",
+							"type": "text"
+						},
+						{
+							"key": "success_action_status",
+							"value": "201",
+							"type": "text"
+						},
+						{
+							"key": "x-amz-meta-id_user",
+							"value": "20399816",
+							"type": "text"
+						},
+						{
+							"key": "x-amz-meta-handler",
+							"value": "handler_correspondence_media_gallery",
+							"type": "text"
+						},
+						{
+							"key": "x-amz-meta-uuid",
+							"value": "e992fa73-7170-48b4-9121-e0a76cbdbadb",
+							"type": "text"
+						},
+						{
+							"key": "x-amz-meta-type",
+							"value": "video\n",
+							"type": "text"
+						},
+						{
+							"key": "x-amz-meta-env-domain",
+							"value": "prod",
+							"type": "text"
+						},
+						{
+							"key": "X-Amz-Credential",
+							"value": "AKIAIF7NRDMPYANUOIPA/20190829/us-east-1/s3/aws4_request",
+							"type": "text"
+						},
+						{
+							"key": "X-Amz-Algorithm",
+							"value": "AWS4-HMAC-SHA256",
+							"type": "text"
+						},
+						{
+							"key": "X-Amz-Date",
+							"value": "20190829T130726Z",
+							"type": "text"
+						},
+						{
+							"key": "Policy",
+							"value": "eyJleHBpcmF0aW9uIjoiMjAxOS0wOC0yOVQyMTowNzoyNloiLCJjb25kaXRpb25zIjpbeyJhY2wiOiJwcml2YXRlIn0seyJidWNrZXQiOiJ2Yi12aWRlby1pbnB1dCJ9LFsic3RhcnRzLXdpdGgiLCIka2V5IiwiZTk5MmZhNzMtNzE3MC00OGI0LTkxMjEtZTBhNzZjYmRiYWRiXC8iXSxbInN0YXJ0cy13aXRoIiwiJENvbnRlbnQtVHlwZSIsInZpZGVvXC8iXSxbImNvbnRlbnQtbGVuZ3RoLXJhbmdlIiwwLDEwNzM3NDE4MjRdLHsic3VjY2Vzc19hY3Rpb25fc3RhdHVzIjoiMjAxIn0sWyJzdGFydHMtd2l0aCIsIiR4LWFtei1tZXRhLWlkX21pcnJvcnMiLCJtIl0sWyJlcSIsIiR4LWFtei1tZXRhLWlkX3VzZXIiLDIwMzk5ODE2XSxbImVxIiwiJHgtYW16LW1ldGEtaGFuZGxlciIsImhhbmRsZXJfY29ycmVzcG9uZGVuY2VfbWVkaWFfZ2FsbGVyeSJdLFsiZXEiLCIkeC1hbXotbWV0YS11dWlkIiwiZTk5MmZhNzMtNzE3MC00OGI0LTkxMjEtZTBhNzZjYmRiYWRiIl0sWyJlcSIsIiR4LWFtei1tZXRhLXR5cGUiLCJ2aWRlbyJdLFsiZXEiLCIkeC1hbXotbWV0YS1lbnYtZG9tYWluIiwicHJvZCJdLHsiWC1BbXotRGF0ZSI6IjIwMTkwODI5VDEzMDcyNloifSx7IlgtQW16LUNyZWRlbnRpYWwiOiJBS0lBSUY3TlJETVBZQU5VT0lQQVwvMjAxOTA4MjlcL3VzLWVhc3QtMVwvczNcL2F3czRfcmVxdWVzdCJ9LHsiWC1BbXotQWxnb3JpdGhtIjoiQVdTNC1ITUFDLVNIQTI1NiJ9XX0=\n\n-----------------------------11540777221021\n\nContent-Disposition: form-data; name=\"X-Amz-Signature\"\n\n\n\n5ee46b2b386bf0a201580d7043265c231d37ba962ae3b12ac19986c80ee8b893",
+							"type": "text"
+						},
+						{
+							"key": "X-Amz-Signature",
+							"value": "5ee46b2b386bf0a201580d7043265c231d37ba962ae3b12ac19986c80ee8b893",
+							"type": "text"
+						},
+						{
+							"key": "x-amz-meta-id_mirrors",
+							"value": "m",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://vb-video-input.s3.amazonaws.com/",
+					"protocol": "https",
+					"host": [
+						"vb-video-input",
+						"s3",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "saveMailMediaGallery",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "cbfbc75f-3d73-4432-ada7-ed03921b2404",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"idUser\": 20399816,\n    \"media\": [\n        {\n            \"key\": \"shpzkl6a14p74p4r8\",\n            \"size\": \"384x384\",\n            \"full_size\": \"https://i.gstatvb.com/shpzkl6a14p74p4r8.292e8ed4.gif\",\n            \"url_thumbnail\": \"https://i.gstatvb.com/shpzkl6a14p74p4r8.292e8ed4.gif\",\n            \"id_user\": 20399816\n        }\n    ],\n    \"type\": \"photo\"\n}"
+				},
+				"url": {
+					"raw": "https://api.prime.date/upload/save-mail-media-gallery",
+					"protocol": "https",
+					"host": [
+						"api",
+						"prime",
+						"date"
+					],
+					"path": [
+						"upload",
+						"save-mail-media-gallery"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "1A.saveMailMediaGalleryAudio",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "cbfbc75f-3d73-4432-ada7-ed03921b2404",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"idUser\": 20399816,\n    \"media\": [\n        {\n            \"title\": \"Artur_Pirozhkov_-_Zacepila.mp3\"\n        }\n    ],\n    \"type\": \"audio\"\n}"
+				},
+				"url": {
+					"raw": "https://api.prime.date/upload/save-mail-media-gallery",
+					"protocol": "https",
+					"host": [
+						"api",
+						"prime",
+						"date"
+					],
+					"path": [
+						"upload",
+						"save-mail-media-gallery"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2A.audioUpload",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "cbfbc75f-3d73-4432-ada7-ed03921b2404",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "https://api.prime.date/upload/audio-upload-params?idUser=20399816&idAudio=69318",
+					"protocol": "https",
+					"host": [
+						"api",
+						"prime",
+						"date"
+					],
+					"path": [
+						"upload",
+						"audio-upload-params"
+					],
+					"query": [
+						{
+							"key": "idUser",
+							"value": "20399816"
+						},
+						{
+							"key": "idAudio",
+							"value": "69318"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3A.uploadAudio",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "cbfbc75f-3d73-4432-ada7-ed03921b2404",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/alex/Music/Artur_Pirozhkov_-_Zacepila.mp3"
+						},
+						{
+							"key": "key",
+							"value": "e992fa73-7170-48b4-9121-e0a76cbdbadb/${filename}",
+							"type": "text"
+						},
+						{
+							"key": "Content-Type",
+							"value": "audio/mpeg",
+							"type": "text"
+						},
+						{
+							"key": "success_action_status",
+							"value": "201",
+							"type": "text"
+						},
+						{
+							"key": "x-amz-meta-id_user",
+							"value": "20399816",
+							"type": "text"
+						},
+						{
+							"key": "x-amz-meta-id",
+							"value": "69318",
+							"type": "text"
+						},
+						{
+							"key": "x-amz-meta-uuid",
+							"value": "e992fa73-7170-48b4-9121-e0a76cbdbadb",
+							"type": "text"
+						},
+						{
+							"key": "x-amz-meta-type",
+							"value": "audio",
+							"type": "text"
+						},
+						{
+							"key": "x-amz-meta-env-domain",
+							"value": "prod",
+							"type": "text"
+						},
+						{
+							"key": "X-Amz-Credential",
+							"value": "AKIAIF7NRDMPYANUOIPA/20190829/us-east-1/s3/aws4_request",
+							"type": "text"
+						},
+						{
+							"key": "X-Amz-Algorithm",
+							"value": "AWS4-HMAC-SHA256",
+							"type": "text"
+						},
+						{
+							"key": "X-Amz-Date",
+							"value": "20190829T134343Z",
+							"type": "text"
+						},
+						{
+							"key": "Policy",
+							"value": "eyJleHBpcmF0aW9uIjoiMjAxOS0wOC0yOVQyMTo0Mzo0M1oiLCJjb25kaXRpb25zIjpbeyJhY2wiOiJwcml2YXRlIn0seyJidWNrZXQiOiJ2Yi12aWRlby1pbnB1dCJ9LFsic3RhcnRzLXdpdGgiLCIka2V5IiwiZTk5MmZhNzMtNzE3MC00OGI0LTkxMjEtZTBhNzZjYmRiYWRiXC8iXSxbInN0YXJ0cy13aXRoIiwiJENvbnRlbnQtVHlwZSIsImF1ZGlvXC8iXSxbImNvbnRlbnQtbGVuZ3RoLXJhbmdlIiwwLDEwNzM3NDE4MjRdLHsic3VjY2Vzc19hY3Rpb25fc3RhdHVzIjoiMjAxIn0sWyJzdGFydHMtd2l0aCIsIiR4LWFtei1tZXRhLWlkX21pcnJvcnMiLCJtIl0sWyJlcSIsIiR4LWFtei1tZXRhLWlkIiw2OTMxOF0sWyJlcSIsIiR4LWFtei1tZXRhLWlkX3VzZXIiLDIwMzk5ODE2XSxbImVxIiwiJHgtYW16LW1ldGEtaGFuZGxlciIsImhhbmRsZXJfY2hhdF9hdWRpbyJdLFsiZXEiLCIkeC1hbXotbWV0YS11dWlkIiwiZTk5MmZhNzMtNzE3MC00OGI0LTkxMjEtZTBhNzZjYmRiYWRiIl0sWyJlcSIsIiR4LWFtei1tZXRhLXR5cGUiLCJhdWRpbyJdLFsiZXEiLCIkeC1hbXotbWV0YS1lbnYtZG9tYWluIiwicHJvZCJdLHsiWC1BbXotRGF0ZSI6IjIwMTkwODI5VDEzNDM0M1oifSx7IlgtQW16LUNyZWRlbnRpYWwiOiJBS0lBSUY3TlJETVBZQU5VT0lQQVwvMjAxOTA4MjlcL3VzLWVhc3QtMVwvczNcL2F3czRfcmVxdWVzdCJ9LHsiWC1BbXotQWxnb3JpdGhtIjoiQVdTNC1ITUFDLVNIQTI1NiJ9XX0=",
+							"type": "text"
+						},
+						{
+							"key": "X-Amz-Signature",
+							"value": "feebb47a4ee13037193a2782712422431f1b6057760777f13919a5c36b02bea6",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://vb-video-input.s3.amazonaws.com/",
+					"protocol": "https",
+					"host": [
+						"vb-video-input",
+						"s3",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-mail-media-gallery of user",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "cbfbc75f-3d73-4432-ada7-ed03921b2404",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "https://api.prime.date/upload/get-mail-media-gallery?idUser=20399816",
+					"protocol": "https",
+					"host": [
+						"api",
+						"prime",
+						"date"
+					],
+					"path": [
+						"upload",
+						"get-mail-media-gallery"
+					],
+					"query": [
+						{
+							"key": "idUser",
+							"value": "20399816"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "logout",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "https://api.prime.date/auth/logout",
+					"protocol": "https",
+					"host": [
+						"api",
+						"prime",
+						"date"
+					],
+					"path": [
+						"auth",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

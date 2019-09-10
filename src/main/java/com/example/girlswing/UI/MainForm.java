@@ -1,6 +1,7 @@
 package com.example.girlswing.UI;
 
 
+import com.example.girlswing.services.ChatSendFormService;
 import com.example.girlswing.utils.MasterDataLoader;
 import lombok.extern.slf4j.Slf4j;
 import mdlaf.animation.MaterialUIMovement;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -26,11 +28,16 @@ public class MainForm extends JFrame {
     @Autowired
     ChatSendForm chatSendForm;
 
+    @Autowired
+    ChatSendFormService chatSendFormService;
+
     private JList listOfGirls;
 
     private DefaultListModel<String> chatModel;
 
     private DefaultListModel<String> mailModel;
+
+    private JPanel distributionPANEL;
 
     MainForm() {
         setSize(1200,800);
@@ -55,23 +62,56 @@ public class MainForm extends JFrame {
         girlsListPanel.add(new JScrollPane(listOfGirls), BorderLayout.CENTER);
         girlsListPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 
-        JPanel panel1 = new JPanel();
-        panel1.setLayout(new BorderLayout());
+        distributionPANEL = new JPanel();
+        distributionPANEL.setLayout(new BorderLayout());
 
 
-        panel1.add(girlsListPanel, BorderLayout.LINE_START);
+        distributionPANEL.add(girlsListPanel, BorderLayout.LINE_START);
 
         JTabbedPane tPane = new JTabbedPane();
-        tPane.addTab("Рассылка", panel1);
+        tPane.addTab("Рассылка", distributionPANEL);
         tPane.addTab("Статистика", new JPanel());
         tPane.addTab("VIP", new JPanel());
         add(tPane);
 
         //chat panel
+        setChatPanel();
+
+        //mail panel
+        setMailPanel();
+
+        setLocationRelativeTo(null);
+    }
+
+    private void setChatPanel(){
+        JPanel chatPanel = new JPanel();
         JLabel chatLabel = new JLabel("Chat");
         chatLabel.setBorder(BorderFactory.createMatteBorder(0,0,1,0, Color.BLACK));
+        JPanel buttonsPanel = new JPanel();
+        JPanel startStopPanel = new JPanel();
+        JSlider timer = new JSlider(2,4,3);
+        timer.setMajorTickSpacing(1);
         JButton chatButton = new JButton("Add new chat message");
-        JPanel chatPanel = new JPanel();
+
+        JButton startButton = new JButton("Start");
+        MaterialUIMovement.add (startButton, MaterialColors.GREEN_300);
+        //startButton.setBorder(MaterialBorders.LIGHT_LINE_BORDER);
+        startButton.setForeground(MaterialColors.GREEN_300);
+
+        JButton stopButton = new JButton("Stop");
+        MaterialUIMovement.add (stopButton, MaterialColors.RED_300);
+        //stopButton.setBorder(MaterialBorders.DEFAULT_SHADOW_BORDER);
+        stopButton.setForeground(MaterialColors.RED_300);
+        //fill start and stop button to panel
+        //startStopPanel.setLayout();
+        startStopPanel.add(startButton);
+        startStopPanel.add(stopButton);
+
+        buttonsPanel.setLayout(new BorderLayout());
+        buttonsPanel.add(timer, BorderLayout.NORTH);
+        buttonsPanel.add(chatButton, BorderLayout.CENTER);
+        buttonsPanel.add(startStopPanel, BorderLayout.SOUTH);
+
         chatModel = new DefaultListModel<>();
         JList chatList = new JList(chatModel);
 
@@ -79,18 +119,27 @@ public class MainForm extends JFrame {
         MaterialUIMovement.add (chatButton, MaterialColors.GRAY_700);
         chatButton.addActionListener((ActionEvent event)  -> {
             chatSendForm.setVisible(true);
+            chatSendForm.setValuesToFilters();
+        });
+
+        startButton.addActionListener((ActionEvent event)  -> {
+            chatSendFormService.getAllActiveUsersAndSendThemMessage();
         });
 
         chatPanel.setPreferredSize(new Dimension(400,700));
         chatPanel.setLayout(new BorderLayout());
         chatPanel.add(chatLabel, BorderLayout.NORTH);
         chatPanel.add(new JScrollPane(chatList), BorderLayout.CENTER);
-        chatPanel.add(chatButton, BorderLayout.SOUTH);
+        chatPanel.add(buttonsPanel, BorderLayout.SOUTH);
+
+        startButton.setSize(startStopPanel.getWidth()/2, startStopPanel.getHeight());
+        stopButton.setSize(startStopPanel.getWidth()/2, startStopPanel.getHeight());
         chatPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 
-        panel1.add(chatPanel, BorderLayout.CENTER);
+        distributionPANEL.add(chatPanel, BorderLayout.CENTER);
+    }
 
-        //mail panel
+    private void setMailPanel(){
         JLabel mailLabel = new JLabel("Mail");
         mailLabel.setBorder(BorderFactory.createMatteBorder(0,0,1,0, Color.BLACK));
         JButton mailButton = new JButton("Add new mail message");
@@ -110,11 +159,8 @@ public class MainForm extends JFrame {
         mailPanel.add(mailList, BorderLayout.CENTER);
         mailPanel.add(mailButton, BorderLayout.SOUTH);
         mailPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-        panel1.add(mailPanel, BorderLayout.LINE_END);
-
-        setLocationRelativeTo(null);
+        distributionPANEL.add(mailPanel, BorderLayout.LINE_END);
     }
-
     public void setElementsToListOfGirls(ListModel elements) {
         this.listOfGirls.setModel(elements);
     }
