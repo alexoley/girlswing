@@ -98,23 +98,23 @@ public class RequestService {
 
     }
 
-    public HttpResponse send(String idTo, String text){
-        return send(idTo, text, "");
+    public HttpResponse send(String idTo, String text, String girlId){
+        return send(idTo, text, "", girlId);
     }
 
     //@Async
-    public HttpResponse send(String idTo, String text, String userAgent){
+    public HttpResponse send(String idTo, String text, String userAgent, String girlId){
         Date date = new Date();
         Long timeMilis = date.getTime();
         String json = new JSONObject()
                 .put("idUserTo", idTo)
                 .put("idMale", idTo)
-                .put("idFemale", "20399816")
+                .put("idFemale", girlId)
                 .put("content", new JSONObject().put("message", text).put("id", timeMilis.toString())).toString();
 
         return basicRequest(json,
                 siteApiLink+"/operator/add-activity/message/"+idTo,
-                true, userAgent);
+                true, userAgent, "post");
     }
 
     public HttpResponse findFemale(){
@@ -129,11 +129,11 @@ public class RequestService {
                 true, "get");
     }
 
-    public HttpResponse getConnections(int onliners, int offset){
-        return getConnections(onliners, offset, "");
+    public HttpResponse getConnections(int onliners, int bookmarked, int nomessages , int offset){
+        return getConnections(onliners, bookmarked, nomessages ,  offset, "");
     }
 
-    public HttpResponse getConnections(int onliners, int offset, String cursor){
+    public HttpResponse getConnections(int onliners, int bookmarked, int nomessages , int offset, String cursor){
         JSONObject jsonObject = new JSONObject()
                 .put("limit", 50)
                 .put("offset", offset)
@@ -141,8 +141,8 @@ public class RequestService {
                 .put("criteria", new JSONObject().put("filters",
                         new JSONObject().put("id_dialog", 0)
                                 .put("id_female", "null")
-                                .put("bookmarked", 0)
-                                .put("nomessages", 0)
+                                .put("bookmarked", bookmarked)
+                                .put("nomessages", nomessages)
                                 .put("unanswered", 0)
                                 .put("onliners", onliners)));
         if(!cursor.isEmpty()){

@@ -1,24 +1,29 @@
 package com.example.girlswing.services;
 
 
-import com.example.girlswing.UI.MainPage;
+import com.example.girlswing.UI.ChatSendForm;
+import com.example.girlswing.UI.MainForm;
+import com.example.girlswing.pojo.Task;
 import com.example.girlswing.utils.CookieP;
+import com.example.girlswing.utils.MasterDataLoader;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
+import org.apache.http.HttpResponse;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
-public class MainPageService {
+public class MainFormService {
 
     @Value("${site.api.link:}")
     private String siteApiLink;
@@ -30,7 +35,7 @@ public class MainPageService {
     RequestService requestService;
 
     @Autowired
-    MainPage mainPage;
+    MainForm mainForm;
 
     @Autowired
     LoginService loginService;
@@ -40,6 +45,12 @@ public class MainPageService {
 
     @Autowired
     ManService manService;
+
+    @Autowired
+    MasterDataLoader masterDataLoader;
+
+    @Autowired
+    ChatSendForm chatSendForm;
 
     public void sendOld(String idTo, String text){
         Date date = new Date();
@@ -141,6 +152,33 @@ public class MainPageService {
 
     }
 
+    public void sendToAllFromList(List<String> ids, String text, String girlId){
+        final long xRateLimitReset = ((long) masterDataLoader.get("X-Rate-Limit-Reset")+1L)*1000L;
+        HttpResponse response;
+        for(String id: ids){
+            response = requestService.send(id, text, girlId);
+            if(responseService.getSecondsToWaitUntilRateLimitIncrease(response) > 0){
+                try {
+                    Thread.sleep(xRateLimitReset);
+                }
+                catch(InterruptedException e){
+                    log.error("Interrupted exception in send to all from list");
+                    e.printStackTrace();
+                }
+            }
+            if(!responseService.isMessageResponseOk(response)){
+                try {
+                    Thread.sleep(xRateLimitReset);
+                }
+                catch(InterruptedException e){
+                    log.error("Interrupted exception in send to all from list");
+                    e.printStackTrace();
+                }
+                response = requestService.send(id, text, girlId);
+            }
+        }
+    }
+
     public void countEntryOfMessage(String message){
         String json = new JSONObject()
                 .put("criteria", new JSONObject().put("filters", new JSONObject()
@@ -176,7 +214,10 @@ public class MainPageService {
         }
     }
 
-
-
-
+    public void sendChatMessagesToAllTasks(int chatDelay, String girlId, JButton source){
+        for(Task task : chatSendForm.getTaskList()){
+           task.execute(task.getText(), chatDelay, girlId, task.getFilters());
+            source.setEnabled(true);
+        }
+    }
 }

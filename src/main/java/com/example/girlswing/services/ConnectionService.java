@@ -23,16 +23,16 @@ public class ConnectionService {
 
 
 
-    public ConnectionBox getConnectionBox(int onliners, int offset) throws ConnectionEmptyException {
-        return getConnectionBox(onliners, offset,"");
+    public ConnectionBox getConnectionBox(int onliners, int bookmarked, int nomessages , int offset) throws ConnectionEmptyException {
+        return getConnectionBox(onliners, bookmarked, nomessages, offset,"");
     }
-    public ConnectionBox getConnectionBox(int onliners, int offset, String cursor) throws ConnectionEmptyException {
+    public ConnectionBox getConnectionBox(int onliners, int bookmarked, int nomessages , int offset, String cursor) throws ConnectionEmptyException {
         String cursorNew = null;
         List<Connection> connectionList=null;
         Optional jsonNode = cursor.isEmpty()?responseService.returnResponseBodyJsonNode(
-                requestService.getConnections(onliners, offset))
+                requestService.getConnections(onliners, bookmarked, nomessages, offset))
                 :responseService.returnResponseBodyJsonNode(
-                requestService.getConnections(onliners, offset, cursor));
+                requestService.getConnections(onliners, bookmarked, nomessages, offset, cursor));
         if (jsonNode.isPresent()) {
             JsonNode connections = ((JsonNode) jsonNode.get()).findPath("data").findPath("connections");
             cursorNew = ((JsonNode) jsonNode.get()).findPath("data").findPath("cursor").toString();
@@ -43,6 +43,7 @@ public class ConnectionService {
                         .map(conn -> Connection.builder()
                                 .id(conn.findPath("id").toString())
                                 .state(conn.findPath("state").toString())
+                                .idMale(conn.findPath("idMale").toString())
                                 .isFemaleAbused(conn.findPath("isFemaleAbused").isBoolean() ?
                                         Boolean.valueOf(conn.findPath("isFemaleAbused").toString()) : false)
                                 .id_user_from(conn.findPath("chat").findPath("id_user_from").toString())

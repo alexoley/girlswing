@@ -11,10 +11,6 @@ import java.util.List;
 @AllArgsConstructor
 public class ConnectionBox<String, Connection>{
 
-    String cursor;
-    List<Connection> connections;
-        /*ConnectionBox(String cursor, List<Connection> connections){
-            this.connections=connections;
-            this.cursor=cursor;
-        }*/
+    private String cursor;
+    private List<Connection> connections;
 }

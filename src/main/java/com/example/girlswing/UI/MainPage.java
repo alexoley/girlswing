@@ -1,7 +1,7 @@
 package com.example.girlswing.UI;
 
 import com.example.girlswing.services.LoginService;
-import com.example.girlswing.services.MainPageService;
+import com.example.girlswing.services.MainFormService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ import static javax.swing.GroupLayout.Alignment.CENTER;
 public class MainPage extends JFrame {
 
     @Autowired
-    MainPageService mainPageService;
+    MainFormService mainFormService;
 
     @Autowired
     LoginService loginService;
@@ -57,11 +57,11 @@ public class MainPage extends JFrame {
 
         send.addActionListener((ActionEvent event)  -> {
             //mainPageService.send(toWhom.getText(), message.getText());
-            mainPageService.countEntryOfMessage(toWhom.getText());
+            mainFormService.countEntryOfMessage(toWhom.getText());
         });
 
         sendToAll.addActionListener((ActionEvent event) -> {
-            mainPageService.sendToAll(message.getText());
+            mainFormService.sendToAll(message.getText());
         });
 
         createLayout(message,toWhom,sendToAll, send, menIds, sendToMenIds);

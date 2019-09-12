@@ -1,8 +1,5 @@
 package com.example.girlswing.services;
 
-import com.example.girlswing.exceptions.ConnectionEmptyException;
-import com.example.girlswing.pojo.Connection;
-import com.example.girlswing.pojo.ConnectionBox;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -13,9 +10,7 @@ import org.springframework.stereotype.Service;
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import java.awt.*;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 import java.util.Vector;
 
 @Service
@@ -30,6 +25,9 @@ public class ChatSendFormService {
 
     @Autowired
     ConnectionService connectionService;
+
+    @Autowired
+    MainFormService mainFormService;
 
     public void fillFilterComboBoxWithItemFromJsonNode(JsonNode jsonNode, JComboBox jComboBox, String dictionaryId){
         Vector model = new Vector();
@@ -109,29 +107,38 @@ public class ChatSendFormService {
         }
     }
 
-    public void getAllActiveUsersAndSendThemMessage() {
-        ConnectionBox cb;
-        Set<Connection> uniqueConnections = new HashSet<>();
-        for (int i = 0; i < 5; i++) {
-            try{
-            cb=connectionService.getConnectionBox(0,i);
-            uniqueConnections.addAll(cb.getConnections());}
-            catch(ConnectionEmptyException e){
-                break;
-            }
-            do{
-                try {
-                    cb = connectionService.getConnectionBox(0, i, (String) cb.getCursor());
+    /*public void getAllActiveUsersAndSendThemMessage(String text) {
+        new Thread(()->{
+            ConnectionBox cb;
+            Set<Connection> uniqueConnections = new HashSet<>();
+            Set<Connection> oneRun = new HashSet<>();
+            for (int i = 0; i < 5; i++) {
+                try{
+                    cb=connectionService.getConnectionBox(0,i);
                     uniqueConnections.addAll(cb.getConnections());
-                }
+                    oneRun.addAll(cb.getConnections());}
                 catch(ConnectionEmptyException e){
                     break;
                 }
+                do{
+                    try {
+                        cb = connectionService.getConnectionBox(0, i, (String) cb.getCursor());
+                        uniqueConnections.addAll(cb.getConnections());
+                        oneRun.addAll(cb.getConnections());
+                    }
+                    catch(ConnectionEmptyException e){
+                        break;
+                    }
+                }
+                while(true);
+                oneRun.removeAll(uniqueConnections);
+                mainFormService.sendToAllFromList(oneRun.stream().map(conn -> conn.getIdMale()).collect(Collectors.toList()),
+                        text);
+
             }
-            while(true);
-        }
-        log.debug(uniqueConnections.size()+"");
-        uniqueConnections.forEach(conn -> log.debug(conn.toString()));
-    }
+            log.debug(uniqueConnections.size()+"");
+            uniqueConnections.forEach(conn -> log.debug(conn.toString()));
+        }).start();
+    }*/
 
 }

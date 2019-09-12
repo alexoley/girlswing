@@ -66,7 +66,8 @@ public class LoginService {
         mainForm.setTitle(operator.getId()+" "+operator.getFirstname()+" "+operator.getLastname());
 
         //request to get girls info
-        jsonNodeObject = responseService.returnResponseBodyJsonNode(requestService.findFemale());
+        HttpResponse findFemaleResponse = requestService.findFemale();
+        jsonNodeObject = responseService.returnResponseBodyJsonNode(findFemaleResponse);
         if(!jsonNodeObject.isPresent()){
             throw new LoginException("Empty response body");
         }
@@ -76,6 +77,9 @@ public class LoginService {
         masterDataLoader.put("girls", girls);
         //save girls to remote db
         girlService.saveAll((List<Girl>)masterDataLoader.get("girls"));
+
+        //save x-rate-limit
+        masterDataLoader.put("X-Rate-Limit-Reset", responseService.getXRateLimitReset(findFemaleResponse));
 
         //set girls to left JList
         mainForm.setElementsToListOfGirls(girlService.girlInformationFromList(girls));

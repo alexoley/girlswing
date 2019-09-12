@@ -37,15 +37,16 @@ public class LoginForm extends JFrame{
     JButton btn1;
     JPasswordField passwordField;
 
-    LoginForm(@Value("${test.programm.email:}") String testMail,
-              @Value("${test.programm.password:}") String testPassword) {
+    LoginForm(/*@Value("${test.programm.email:}") String testMail,
+              @Value("${test.programm.password:}") String testPassword,*/
+              @Value("${application.icon:}") String appIcon) {
         try {
-            InputStream icon = getClass().getClassLoader().getResourceAsStream("s_32.png");
+            InputStream icon = getClass().getClassLoader().getResourceAsStream(appIcon);
             setIconImage(ImageIO.read(icon));
         }
         catch(IOException e){
             e.printStackTrace();
-            log.error(getClass().getClassLoader().getResource("s_32.png").getPath());
+            log.error(getClass().getClassLoader().getResource(appIcon).getPath());
         }
         l1 = new JLabel("Login Form");
         l1.setForeground(MaterialColors.BLACK);
@@ -54,8 +55,8 @@ public class LoginForm extends JFrame{
 
         l2 = new JLabel("Username");
         l3 = new JLabel("Password");
-        emailField = new JTextField(testMail);
-        passwordField = new JPasswordField(testPassword);
+        emailField = new JTextField("");
+        passwordField = new JPasswordField("");
         btn1 = new JButton("Login");
         MaterialUIMovement.add (btn1, MaterialColors.GRAY_700);
         btn1.setBorder(MaterialBorders.LIGHT_SHADOW_BORDER);
@@ -84,9 +85,9 @@ public class LoginForm extends JFrame{
             try {
                 loginService.applicationLogin(emailField.getText(), password);
                 this.setVisible(false);
-                mainPage.setVisible(true);
+                /*mainPage.setVisible(true);
                 mainPage.setSize(this.getSize());
-                mainPage.setLocation(this.getLocation());
+                mainPage.setLocation(this.getLocation());*/
 
                 mainForm.setVisible(true);
 
