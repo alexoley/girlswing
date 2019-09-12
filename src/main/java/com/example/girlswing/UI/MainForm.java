@@ -156,8 +156,9 @@ public class MainForm extends JFrame {
         JList chatList = new JList(chatModel);
         //temp
         tempPanel = new JPanel();
-        tempPanel.setLayout(new BoxLayout(tempPanel, BoxLayout.Y_AXIS));
+        tempPanel.setLayout(new GridLayout(8, 1));
         chatScrollPane = new JScrollPane(tempPanel);
+        chatScrollPane.setWheelScrollingEnabled(true);
 
 
         chatButton.setBorder(MaterialBorders.LIGHT_SHADOW_BORDER);
@@ -235,6 +236,7 @@ public class MainForm extends JFrame {
 
         innerPanel.add(closeButton);
         panel.add(innerPanel);
+        ((GridLayout)panel.getLayout()).setRows(((GridLayout)panel.getLayout()).getRows()+1);
         panel.revalidate();
         TaskFactory factory = new TaskFactory();
         closeButton.setTask(factory.getTask(chatSendForm));
