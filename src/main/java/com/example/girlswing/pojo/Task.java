@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -15,7 +16,6 @@ public abstract class Task {
     protected String text;
     protected List ids;
     protected Calendar time;
-    protected Task child;
     protected JProgressBar progressBar;
 
     public Task(String filters, String text) {
@@ -30,21 +30,22 @@ public abstract class Task {
     }
 
     public Task(String filters, String text, LinkedList<String> ids,
-                Calendar time, Task child, JProgressBar progressBar) {
+                Calendar time, JProgressBar progressBar) {
         this.filters = filters;
         this.text = text;
         this.ids = ids;
         this.time = time;
-        this.child = child;
         this.progressBar=progressBar;
     }
 
-    abstract public void execute(String text, long delay, String girlId, String filters);
+    abstract public Set execute(String text, long delay, String girlId, String filters);
 
-    abstract public void execute(String text, long delay, String girlId, String filters, JProgressBar progressBar);
+    abstract public Set execute(String text, long delay, String girlId, String filters, JProgressBar progressBar);
+
+    abstract public Set execute(String text, long delay, String girlId, String filters, List<String> ids);
 
     public boolean equals(Object obj) {
-        return (this!=null && obj!=null && this.filters.equals(((Task)obj).getFilters()) &&
+        return (this.filters.equals(((Task)obj).getFilters()) &&
                 this.getClass().getName().equals(((Task)obj).getClass().getName()));
     }
 }

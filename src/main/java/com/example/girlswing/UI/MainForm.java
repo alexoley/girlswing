@@ -242,7 +242,7 @@ public class MainForm extends JFrame {
         closeButton.setTask(factory.getTask(chatSendForm));
         closeButton.addActionListener((ActionEvent event)  -> {
             Task t = ((CloseButton)event.getSource()).getTask();
-            //chatSendForm.deleteTaskFromList(t);
+            chatSendForm.deleteTaskFromList(t);
             innerPanel.removeAll();
             panel.remove(innerPanel);
             panel.repaint();

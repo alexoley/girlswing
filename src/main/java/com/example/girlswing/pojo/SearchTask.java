@@ -5,7 +5,9 @@ import lombok.Setter;
 
 import javax.swing.*;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -18,16 +20,16 @@ public class SearchTask extends Task {
     public SearchTask(String filters, String text, JProgressBar progressBar) {
         super(filters, text, progressBar);
     }
-    public SearchTask(String name, String filters, String text, LinkedList<String> ids,
-                      Calendar time, Task child, JProgressBar progressBar) {
-        super(filters, text, ids, time, child, progressBar);
+    public SearchTask(String filters, String text, LinkedList<String> ids,
+                      Calendar time, JProgressBar progressBar) {
+        super(filters, text, ids, time, progressBar);
     }
 
-    public void execute(String text, long delay, String girlId, String filters){
-        execute(text, delay, girlId, filters, null);
+    public Set execute(String text, long delay, String girlId, String filters){
+        return execute(text, delay, girlId, filters, null);
     }
 
-    public void execute(String text, long delay, String girlId, String filters, JProgressBar progressBar){
-
+    public Set execute(String text, long delay, String girlId, String filters, JProgressBar progressBar){
+        return new HashSet();
     }
 }

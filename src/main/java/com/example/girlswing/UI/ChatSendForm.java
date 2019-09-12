@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 @Component
 @Getter
@@ -42,7 +43,7 @@ public class ChatSendForm extends JFrame {
 
     private JTextField textField;
 
-    public java.util.List<Task> taskList = new ArrayList();
+    public java.util.List<java.util.List<Task>> taskList = new LinkedList<>();
 
     ChatSendForm(@Value("${application.icon:}") String appIcon){
         try {
@@ -173,6 +174,45 @@ public class ChatSendForm extends JFrame {
         TaskFactory factory = new TaskFactory();
         Task newTask = factory.getTask(this, progressBar);
         if(taskList.isEmpty()) {
+            ArrayList newtaskArray = new ArrayList<>();
+            newtaskArray.add(newTask);
+            taskList.add(newtaskArray);
+        }
+        else {
+            for (java.util.List listOfTasks : taskList) {
+                if(newTask.equals(listOfTasks.get(0))){
+                    listOfTasks.add(newTask);
+                    wasSet=true;
+                }
+            }
+            if(!wasSet){
+                ArrayList newtaskArray = new ArrayList<>();
+                newtaskArray.add(newTask);
+                taskList.add(newtaskArray);
+            }
+        }
+    }
+
+    public void deleteTaskFromList(Task deleteTask){
+        for (java.util.List listOfTasks : taskList) {
+            if(deleteTask.equals(listOfTasks.get(0))){
+                for(int i=0; i<listOfTasks.size(); i++){
+                    if(deleteTask.getText().equals(((Task)listOfTasks.get(i)).getText())){
+                        listOfTasks.remove(i);
+                        if(listOfTasks.isEmpty()){
+                            taskList.remove(listOfTasks);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /*private void addTaskToList(JProgressBar progressBar){
+        boolean wasSet=false;
+        TaskFactory factory = new TaskFactory();
+        Task newTask = factory.getTask(this, progressBar);
+        if(taskList.isEmpty()) {
             taskList.add(newTask);
         }
         else{
@@ -198,7 +238,7 @@ public class ChatSendForm extends JFrame {
         else{
             addTaskToTaskRecursively(task.getChild(), newTask);
         }
-    }
+    }*/
 
     /*public void deleteTaskFromList(Task deleteTask){
         Iterator iter = taskList.iterator();
