@@ -24,6 +24,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 @Component
 @Slf4j
@@ -44,13 +45,16 @@ public class MainForm extends JFrame {
     @Autowired
     MainFormService mainFormService;
 
+    @Autowired
+    TaskFactory taskFactory;
+
     private JList listOfGirls;
 
     private DefaultListModel chatModel;
 
     private DefaultListModel mailModel;
 
-    private JPanel tempPanel;
+    private JPanel chatScrollPanel;
 
     private JPanel distributionPANEL;
 
@@ -59,6 +63,8 @@ public class MainForm extends JFrame {
     private JSlider chatTimer;
 
     JButton chatButton, startChatButton, pauseChatButton, stopChatButton;
+
+    ArrayList<JButton> buttonsToDisable = new ArrayList<>();
 
     MainForm(@Value("${application.icon:}") String appIcon) {
         setSize(1200,800);
@@ -155,9 +161,9 @@ public class MainForm extends JFrame {
         chatModel = new DefaultListModel<>();
         JList chatList = new JList(chatModel);
         //temp
-        tempPanel = new JPanel();
-        tempPanel.setLayout(new GridLayout(8, 1));
-        chatScrollPane = new JScrollPane(tempPanel);
+        chatScrollPanel = new JPanel();
+        chatScrollPanel.setLayout(new GridLayout(8, 1));
+        chatScrollPane = new JScrollPane(chatScrollPanel);
         chatScrollPane.setWheelScrollingEnabled(true);
 
 
@@ -169,18 +175,18 @@ public class MainForm extends JFrame {
         });
 
         startChatButton.addActionListener((ActionEvent event)  -> {
+            JButton source = (JButton) event.getSource();
             try {
+                //chatScrollPanel.
                 String[] massiveOfGirls = ((String) listOfGirls.getSelectedValue()).split(":", 0);
-                JButton source = (JButton) event.getSource();
-                source.setEnabled(false);
-                //startButton.setEnabled(false);
+                buttonsToDisable.add(source);
+                buttonsToDisable.add(chatButton);
+                /*source.setEnabled(false);
+                chatButton.setEnabled(false);*/
                 new Thread(()->mainFormService.sendChatMessagesToAllTasks(chatTimer.getValue(),
-                        massiveOfGirls[massiveOfGirls.length-1], source)).start();
-                //source.setEnabled(true);
+                        massiveOfGirls[massiveOfGirls.length-1], buttons)).start();
             }
             catch (NullPointerException e){
-                JButton source = (JButton) event.getSource();
-                source.setEnabled(true);
                 JOptionPane.showMessageDialog(this,"Select a girl",
                         "Reminder",JOptionPane.INFORMATION_MESSAGE);
             }
@@ -223,14 +229,14 @@ public class MainForm extends JFrame {
         this.listOfGirls.setModel(elements);
     }
 
-    public JProgressBar addElementToChatList(String text, ChatSendForm chatSendForm){
+    public Task addElementToChatList(String text, ChatSendForm chatSendForm){
         JPanel panel = (JPanel) chatScrollPane.getViewport().getView();
         JPanel innerPanel = new JPanel();
         JProgressBar pb = new JProgressBar(SwingConstants.HORIZONTAL);
         pb.setString(text);
         pb.setStringPainted(true);
         innerPanel.add(pb);
-        CloseButton closeButton = new CloseButton("X");
+        CloseButton closeButton = new CloseButton("✗");
 
         MaterialUIMovement.add (closeButton, MaterialColors.DEEP_ORANGE_300);
 
@@ -238,8 +244,10 @@ public class MainForm extends JFrame {
         panel.add(innerPanel);
         ((GridLayout)panel.getLayout()).setRows(((GridLayout)panel.getLayout()).getRows()+1);
         panel.revalidate();
-        TaskFactory factory = new TaskFactory();
-        closeButton.setTask(factory.getTask(chatSendForm));
+        Task newTask = taskFactory.getTask(chatSendForm);
+        newTask.setProgressBar(pb);
+        pb.setToolTipText(newTask.getName());
+        closeButton.setTask(newTask);
         closeButton.addActionListener((ActionEvent event)  -> {
             Task t = ((CloseButton)event.getSource()).getTask();
             chatSendForm.deleteTaskFromList(t);
@@ -248,7 +256,8 @@ public class MainForm extends JFrame {
             panel.repaint();
             panel.revalidate();
         });
-        return pb;
+        buttonsToDisable.add(closeButton);
+        return newTask;
         //chatModel.addElement(text);
     }
 

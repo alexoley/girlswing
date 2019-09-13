@@ -10,31 +10,37 @@ import java.util.*;
 @Setter
 public class SearchTask extends Task {
 
-    public SearchTask(String filters, String text) {
-        super(filters, text);
+    public SearchTask(long id, String name, String filters, String text) {
+        super(id, name, filters, text);
     }
 
-    public SearchTask(String filters, String text, JProgressBar progressBar) {
-        super(filters, text, progressBar);
+    public SearchTask(long id, String name, String filters, String text, JProgressBar progressBar) {
+        super(id, name, filters, text, progressBar);
     }
-    public SearchTask(String filters, String text, LinkedList<String> ids,
+    public SearchTask(long id, String name, String filters, String text, LinkedList<String> ids,
                       Calendar time, JProgressBar progressBar) {
-        super(filters, text, ids, time, progressBar);
+        super(id, name, filters, text, ids, time, progressBar);
     }
 
     @Override
-    public Set execute(String text, long delay, String girlId, String filters,
-                       JProgressBar progressBar, List<String> ids, Set<Connection> beforeConnections) {
-        return new HashSet();
+    public Set execute(String filters, String text, int chatDelay, String girlId,  Set setIncremented) {
+        return execute(filters, text, (List<String>) null, chatDelay, girlId, setIncremented);
     }
 
     @Override
-    public Set execute(String text, int chatDelay, String girlId, String filters, Set setIncremented) {
-        return new HashSet();
+    public Set execute(String filters, String text, List<String> ids, int chatDelay,  String girlId,  Set setIncremented) {
+        return execute(filters, text, ids, null ,chatDelay, girlId, setIncremented);
     }
 
     @Override
-    public Set execute(String text, int chatDelay, String filters, String girlId, List<String> ids, Set setIncremented) {
+    public Set execute(String filters, String text, JProgressBar progressBar,
+                       long chatDelay, String girlId, Set<Connection> setIncremented){
+        return execute(filters, text, null, progressBar ,chatDelay, girlId, setIncremented);
+    }
+
+    @Override
+    public Set execute(String filters, String text, List<String> ids, JProgressBar progressBar,
+                       long delay, String girlId, Set<Connection> beforeConnections) {
         return new HashSet();
     }
 

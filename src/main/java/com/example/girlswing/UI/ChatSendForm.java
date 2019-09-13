@@ -34,7 +34,6 @@ public class ChatSendForm extends JFrame {
     @Autowired
     ChatSendFormService chatSendFormService;
 
-
     private JComboBox country, lastOnline, education, maritialStatus, children, bodyType, religion, drinking, smoking;
 
 
@@ -169,14 +168,12 @@ public class ChatSendForm extends JFrame {
         chatSendFormService.fillFilterComboBoxWithItemFromJsonNode(jsonNode, smoking, "8");
     }
 
-    private void addTaskToList(JProgressBar progressBar){
+    private void addTaskToList(Task newTask){
         boolean wasSet=false;
-        TaskFactory factory = new TaskFactory();
-        Task newTask = factory.getTask(this, progressBar);
         if(taskList.isEmpty()) {
-            ArrayList newtaskArray = new ArrayList<>();
-            newtaskArray.add(newTask);
-            taskList.add(newtaskArray);
+            ArrayList newTaskArray = new ArrayList<>();
+            newTaskArray.add(newTask);
+            taskList.add(newTaskArray);
         }
         else {
             for (java.util.List listOfTasks : taskList) {
@@ -197,7 +194,7 @@ public class ChatSendForm extends JFrame {
         for (java.util.List listOfTasks : taskList) {
             if(deleteTask.equals(listOfTasks.get(0))){
                 for(int i=0; i<listOfTasks.size(); i++){
-                    if(deleteTask.getText().equals(((Task)listOfTasks.get(i)).getText())){
+                    if(deleteTask.getId()==((Task)listOfTasks.get(i)).getId()){
                         listOfTasks.remove(i);
                         if(listOfTasks.isEmpty()){
                             taskList.remove(listOfTasks);

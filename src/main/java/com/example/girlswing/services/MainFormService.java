@@ -18,8 +18,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -56,52 +58,46 @@ public class MainFormService {
     @Autowired
     ChatSendForm chatSendForm;
 
-    public void sendOld(String idTo, String text){
+    public void sendOld(String idTo, String text) {
         Date date = new Date();
         Long timeMilis = date.getTime();
         Request request = new Request.Builder().method("POST",
                 RequestBody.create(MediaType.parse("application/json"),
-                        "{\"idUserTo\":"+idTo+",\"idMale\":36661269,\"idFemale\":20399816," +
-                                "\"content\":{\"message\":\""+text+"\",\"id\":"+timeMilis.toString()+"}}" ))
-                .url(HttpUrl.parse(siteApiLink+"/operator/add-activity/message/"+idTo))
+                        "{\"idUserTo\":" + idTo + ",\"idMale\":36661269,\"idFemale\":20399816," +
+                                "\"content\":{\"message\":\"" + text + "\",\"id\":" + timeMilis.toString() + "}}"))
+                .url(HttpUrl.parse(siteApiLink + "/operator/add-activity/message/" + idTo))
                 .build();
         //OkHttpClient httpClient = new OkHttpClient();
-        try
-        {
+        try {
             Response response = new OkHttpClient().newBuilder()
                     .readTimeout(2, TimeUnit.SECONDS)
                     .build()
                     .newCall(request)
                     .execute();
-            if(response.isSuccessful())
-            {
+            if (response.isSuccessful()) {
                 log.debug(response.body().string());
                 //response.body().
-            }
-            else
-            {
+            } else {
                 log.info(response.body().string());
             }
-        }
-        catch (IOException e1)
-        {
+        } catch (IOException e1) {
 
         }
     }
 
 
-    public void sendToAll(String text){
+    public void sendToAll(String text) {
         long startTime = System.currentTimeMillis();
         Queue<String> menIds = manService.getMenIds();
         long endTime = System.currentTimeMillis();
 
         Long duration = (endTime - startTime);
-        Long sec = duration/1000;
-        Long min = sec/60;
+        Long sec = duration / 1000;
+        Long min = sec / 60;
         Long secAtTheEnd = sec % 60;
 
-        log.debug("time of mining: "+min.toString()+"min "+secAtTheEnd.toString()+"sec");
-        log.debug("list count:"+ menIds.size());
+        log.debug("time of mining: " + min.toString() + "min " + secAtTheEnd.toString() + "sec");
+        log.debug("list count:" + menIds.size());
 
         /*startTime = System.currentTimeMillis();
         //mainPage.setBar2Max(menIds.size());
@@ -156,38 +152,42 @@ public class MainFormService {
 
     }
 
-    public void sendToAllFromList(List<String> ids, String text, String girlId){
-        final long xRateLimitReset = ((long) masterDataLoader.get("X-Rate-Limit-Reset")+1L)*1000L;
+    public void sendToAllFromList(List<String> ids, String text, String girlId, JProgressBar progressBar) {
+        final long xRateLimitReset = ((long) masterDataLoader.get("X-Rate-Limit-Reset") + 1L) * 1000L;
         HttpResponse response;
-        for(String id: ids){
+        int i = 0;
+        for (String id : ids) {
+            i++;
+            final int j = i;
             response = requestService.send(id, text, girlId);
-            if(responseService.getSecondsToWaitUntilRateLimitIncrease(response) > 0){
+            if (responseService.getSecondsToWaitUntilRateLimitIncrease(response) > 0) {
                 try {
                     Thread.sleep(xRateLimitReset);
-                }
-                catch(InterruptedException e){
+                } catch (InterruptedException e) {
                     log.error("Interrupted exception in send to all from list");
                     e.printStackTrace();
                 }
             }
-            if(!responseService.isMessageResponseOk(response)){
+            if (!responseService.isMessageResponseOk(response)) {
                 try {
                     Thread.sleep(xRateLimitReset);
-                }
-                catch(InterruptedException e){
+                } catch (InterruptedException e) {
                     log.error("Interrupted exception in send to all from list");
                     e.printStackTrace();
                 }
-                response = requestService.send(id, text, girlId);
+                requestService.send(id, text, girlId);
+            }
+            if (progressBar != null) {
+                EventQueue.invokeLater(() -> progressBar.setValue(j));
             }
         }
     }
 
-    public void countEntryOfMessage(String message){
+    public void countEntryOfMessage(String message) {
         String json = new JSONObject()
                 .put("criteria", new JSONObject().put("filters", new JSONObject()
                         .put("id_dialog", 0)
-                        .put("id_female","null")
+                        .put("id_female", "null")
                         .put("bookmarked", 0)
                         .put("nomessages", 0)
                         .put("unanswered", 0)
@@ -197,49 +197,53 @@ public class MainFormService {
                 .put("type", "operatorchat").toString();
 
         String responseText = responseService.returnResponseBodyString(requestService.basicRequest(json,
-                siteApiLink+"/connections/get",
+                siteApiLink + "/connections/get",
                 true, "post"));
 
         try {
-            int i=0;
+            int i = 0;
             JsonNode jsonNode = new ObjectMapper().readTree(responseText);
             JsonNode connections = jsonNode.findPath("data").findPath("connections");
             if (connections.isArray()) {
                 for (JsonNode conn : connections) {
-                    if(message.equals(conn.findPath("chat").findPath("message").asText())){
+                    if (message.equals(conn.findPath("chat").findPath("message").asText())) {
                         i++;
                     }
                 }
             }
-            log.debug("Entry of message in chat: "+i);
-        }
-        catch(Exception e){
+            log.debug("Entry of message in chat: " + i);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void sendChatMessagesToAllTasks(int chatDelay, String girlId, JButton source){
+    public void sendChatMessagesToAllTasks(int chatDelay, String girlId, JButton... buttons) {
         Set setIncremented = new HashSet();
         Set setForEachIteration;
-        for(List taskList : chatSendForm.getTaskList()){
-            setForEachIteration=((Task)taskList.get(0)).execute(((Task)taskList.get(0)).getText(), chatDelay,
-                    girlId, ((Task)taskList.get(0)).getFilters(),setIncremented);
+        for (List taskList : chatSendForm.getTaskList()) {
+            setForEachIteration = ((Task) taskList.get(0)).execute(((Task) taskList.get(0)).getFilters(),
+                    ((Task) taskList.get(0)).getText(), ((Task) taskList.get(0)).getProgressBar(), chatDelay,
+                    girlId, setIncremented);
             List<String> ids = new LinkedList<>();
-            for(Object conn : setForEachIteration){
-                ids.add(((Connection)conn).getIdMale());
+            for (Object conn : setForEachIteration) {
+                ids.add(((Connection) conn).getIdMale());
             }
 
             /*TODO: Make lambda that can cast and collect man ids to list*/
             /*List<String> ids = setForEachIteration.stream()
-                   *//* .filter(conn -> conn instanceof Connection)
+             *//* .filter(conn -> conn instanceof Connection)
                     .map(Connection.class::cast)*//*
                     //.filter(conn -> Objects.nonNull(conn.getIdMale()))
                     .map(conn -> ((Connection)conn).getIdMale()).collect(Collectors.toList());*/
-            if(!ids.isEmpty()) {
-                for (Object task : taskList.subList(1, taskList.size())) {
+            Iterator it = taskList.iterator();
+            it.next();
+            while (it.hasNext()) {
+                Object task = it.next();
+                if (!ids.isEmpty()) {
                     ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-                    Runnable runnableTask = () -> ((Task) task).execute(((Task) task).getText(), chatDelay,
-                            ((Task) task).getFilters(), girlId, ids, setIncremented);
+                    Runnable runnableTask = () -> ((Task) task).execute(((Task) task).getFilters(),
+                            ((Task) task).getText(), ids, ((Task) task).getProgressBar(), chatDelay,
+                            girlId, setIncremented);
                     ScheduledFuture<?> future = executor.schedule(runnableTask, chatDelay * 60L, TimeUnit.SECONDS);
                     try {
                         executor.shutdown();
@@ -248,10 +252,20 @@ public class MainFormService {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                } else {
+                    if (((Task) task).getProgressBar() != null) {
+                        EventQueue.invokeLater(() ->
+                        {
+                            ((Task) task).getProgressBar().setMaximum(1);
+                            ((Task) task).getProgressBar().setValue(1);
+                        });
+                    }
                 }
             }
             setIncremented.addAll(setForEachIteration);
-            source.setEnabled(true);
+        }
+        for(JButton button : buttons){
+            button.setEnabled(true);
         }
     }
 }

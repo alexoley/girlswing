@@ -63,7 +63,12 @@ public class LoginService {
         operator.setEmail(email);
         masterDataLoader.put("operator",operator);
         operatorService.save((Operator) masterDataLoader.get("operator"));
-        mainForm.setTitle(operator.getId()+" "+operator.getFirstname()+" "+operator.getLastname());
+        StringBuffer space = new StringBuffer(140);
+        for (int i = 0; i < 140; i++){
+            space.append(" ");
+        }
+        mainForm.setTitle("Rocketgirls"+space.toString()
+                +operator.getId()+" "+operator.getFirstname()+" "+operator.getLastname());
 
         //request to get girls info
         HttpResponse findFemaleResponse = requestService.findFemale();

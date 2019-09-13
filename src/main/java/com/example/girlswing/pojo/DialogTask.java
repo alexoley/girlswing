@@ -7,7 +7,9 @@ import com.example.girlswing.utils.SpringUtils;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import javax.swing.*;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
@@ -15,32 +17,38 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DialogTask extends Task {
 
-    public DialogTask(String filters, String text) {
-        super(filters, text);
+    public DialogTask(long id, String name, String filters, String text) {
+        super(id, name, filters, text);
     }
 
-    public DialogTask(String filters, String text, JProgressBar progressBar) {
-        super(filters, text, progressBar);
+    public DialogTask(long id, String name, String filters, String text, JProgressBar progressBar) {
+        super(id, name, filters, text, progressBar);
     }
 
-    public DialogTask(String filters, String text, LinkedList<String> ids,
+    public DialogTask(long id, String name, String filters, String text, LinkedList<String> ids,
                       Calendar time, JProgressBar progressBar) {
-        super(filters, text, ids, time, progressBar);
+        super(id, name, filters, text, ids, time, progressBar);
     }
 
     @Override
-    public Set execute(String text, int chatDelay, String girlId, String filters, Set setIncremented) {
-        return execute(text, chatDelay, girlId, filters,null,  null, setIncremented);
+    public Set execute(String filters, String text, int chatDelay, String girlId,  Set setIncremented) {
+        return execute(filters, text, (List<String>) null, chatDelay, girlId, setIncremented);
     }
 
     @Override
-    public Set execute(String text, int chatDelay, String filters, String girlId, List<String> ids, Set setIncremented) {
-        return execute(text, chatDelay, girlId, filters,null,  ids, setIncremented);
+    public Set execute(String filters, String text, List<String> ids, int chatDelay,  String girlId,  Set setIncremented) {
+        return execute(filters, text, ids, null ,chatDelay, girlId, setIncremented);
     }
 
     @Override
-    public Set execute(String text, long delay, String girlId, String filters,
-                        JProgressBar progressBar, List<String> ids, Set<Connection> beforeConnections){
+    public Set execute(String filters, String text, JProgressBar progressBar,
+                       long chatDelay, String girlId, Set<Connection> setIncremented){
+        return execute(filters, text, null, progressBar ,chatDelay, girlId, setIncremented);
+    }
+
+    @Override
+    public Set execute(String filters, String text, List<String> ids, JProgressBar progressBar,
+                       long delay, String girlId, Set<Connection> beforeConnections){
 
         /*TODO: Come up with, how to delete this SpringUtils calls*/
         ConnectionService connectionService = SpringUtils.getBean(ConnectionService.class);
@@ -66,8 +74,10 @@ public class DialogTask extends Task {
             }
             final int max = 5;
             if (progressBar != null) {
-                progressBar.setMinimum(1);
-                progressBar.setMaximum(max);
+                EventQueue.invokeLater(() -> {
+                    progressBar.setMinimum(0);
+                    progressBar.setMaximum(max-1);
+                });
             }
             ConnectionBox cb;
             Set<Connection> oneRun = new HashSet<>();
@@ -91,14 +101,25 @@ public class DialogTask extends Task {
                 while (true);
                 oneRun.removeAll(uniqueConnections);
                 oneRun.removeAll(beforeConnections);
+
+                //set new value to progress bar
+                final int j = i;
+                if (progressBar != null) {
+                    EventQueue.invokeLater(new Runnable() {
+                        public void run() {
+                            progressBar.setValue(j);
+                        }
+                    });
+                }
+
                 mainFormService.sendToAllFromList(oneRun.stream().filter(conn -> Objects.nonNull(conn.getIdMale()))
                                 .map(conn -> conn.getIdMale()).collect(Collectors.toList()),
-                        text, girlId);
+                        text, girlId, null);
                 uniqueConnections.addAll(oneRun); //add this
                 oneRun.clear();
-                if (progressBar != null) {
-                    progressBar.setValue(i);
-                }
+            }
+            if (progressBar != null) {
+                EventQueue.invokeLater(() -> progressBar.setValue(progressBar.getMaximum()));
             }
 
             log.debug(uniqueConnections.size()+"");
@@ -106,7 +127,16 @@ public class DialogTask extends Task {
             return uniqueConnections;
         }
         else{
-            mainFormService.sendToAllFromList(ids,text, girlId);
+            if (progressBar != null) {
+                EventQueue.invokeLater(() -> {
+                    progressBar.setMinimum(0);
+                    progressBar.setMaximum(ids.size());
+                });
+            }
+            mainFormService.sendToAllFromList(ids,text, girlId, progressBar);
+            if (progressBar != null) {
+                EventQueue.invokeLater(() -> progressBar.setValue(progressBar.getMaximum()));
+            }
             return uniqueConnections;
         }
     }

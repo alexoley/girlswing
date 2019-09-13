@@ -12,25 +12,33 @@ import java.util.Set;
 @Setter
 public abstract class Task {
 
+    protected long id;
+    protected String name;
     protected String filters;
     protected String text;
     protected List ids;
     protected Calendar time;
     protected JProgressBar progressBar;
 
-    public Task(String filters, String text) {
+    public Task(long id, String name, String filters, String text) {
+        this.id=id;
+        this.name = name;
         this.filters = filters;
         this.text = text;
     }
 
-    public Task(String filters, String text, JProgressBar progressBar) {
+    public Task(long id, String name, String filters, String text, JProgressBar progressBar) {
+        this.id=id;
+        this.name = name;
         this.filters = filters;
         this.text = text;
         this.progressBar=progressBar;
     }
 
-    public Task(String filters, String text, LinkedList<String> ids,
+    public Task(long id, String name, String filters, String text, LinkedList<String> ids,
                 Calendar time, JProgressBar progressBar) {
+        this.id=id;
+        this.name = name;
         this.filters = filters;
         this.text = text;
         this.ids = ids;
@@ -38,16 +46,20 @@ public abstract class Task {
         this.progressBar=progressBar;
     }
 
-    abstract public Set execute(String text, long delay, String girlId, String filters,
-                                JProgressBar progressBar, List<String> ids, Set<Connection> beforeConnections);
+    abstract public Set execute(String filters, String text, int chatDelay, String girlId,  Set setIncremented);
+
+    abstract public Set execute(String filters, String text, List<String> ids, int chatDelay,  String girlId,
+                                 Set setIncremented);
+
+    abstract public Set execute(String filters, String text, JProgressBar progressBar,
+                                long delay, String girlId, Set<Connection> beforeConnections);
+
+    abstract public Set execute(String filters, String text, List<String> ids, JProgressBar progressBar,
+                                long delay, String girlId, Set<Connection> beforeConnections);
 
     public boolean equals(Object obj) {
         return (this.filters.equals(((Task)obj).getFilters()) &&
                 this.getClass().getName().equals(((Task)obj).getClass().getName()));
     }
 
-    public abstract Set execute(String text, int chatDelay, String girlId, String filters, Set setIncremented);
-
-    public abstract Set execute(String text, int chatDelay, String filters, String girlId,
-                                List<String> ids, Set setIncremented);
 }

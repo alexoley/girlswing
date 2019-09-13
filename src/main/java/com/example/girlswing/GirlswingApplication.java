@@ -48,6 +48,7 @@ public class GirlswingApplication{
 			app.setSize(600,400);
 			app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			app.setLocationRelativeTo(null);
+			app.setTitle("Rocketgirls");
 			app.setVisible(true);
 		});
 	}
