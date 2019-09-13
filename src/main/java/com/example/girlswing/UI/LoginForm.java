@@ -37,8 +37,8 @@ public class LoginForm extends JFrame{
     JButton btn1;
     JPasswordField passwordField;
 
-    LoginForm(/*@Value("${test.programm.email:}") String testMail,
-              @Value("${test.programm.password:}") String testPassword,*/
+    LoginForm(@Value("${test.programm.email:}") String testMail,
+              @Value("${test.programm.password:}") String testPassword,
               @Value("${application.icon:}") String appIcon) {
         try {
             InputStream icon = getClass().getClassLoader().getResourceAsStream(appIcon);
@@ -55,8 +55,8 @@ public class LoginForm extends JFrame{
 
         l2 = new JLabel("Username");
         l3 = new JLabel("Password");
-        emailField = new JTextField("");
-        passwordField = new JPasswordField("");
+        emailField = new JTextField(testMail);
+        passwordField = new JPasswordField(testPassword);
         btn1 = new JButton("Login");
         MaterialUIMovement.add (btn1, MaterialColors.GRAY_700);
         btn1.setBorder(MaterialBorders.LIGHT_SHADOW_BORDER);

@@ -11,6 +11,9 @@ public class TaskFactory {
 
     public Task getTask(ChatSendForm frame, JProgressBar progressBar){
 
+        if(frame.getActiveDialogs().isSelected() && frame.getBookmarked().isSelected()){
+            return new SearchTask("", frame.getTextField().getText(), progressBar);
+        }
         if (frame.getActiveDialogs().isSelected()) {
             return new DialogTask("onliners,nomessages", frame.getTextField().getText(), progressBar);
         }

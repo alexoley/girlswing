@@ -38,14 +38,16 @@ public abstract class Task {
         this.progressBar=progressBar;
     }
 
-    abstract public Set execute(String text, long delay, String girlId, String filters);
-
-    abstract public Set execute(String text, long delay, String girlId, String filters, JProgressBar progressBar);
-
-    abstract public Set execute(String text, long delay, String girlId, String filters, List<String> ids);
+    abstract public Set execute(String text, long delay, String girlId, String filters,
+                                JProgressBar progressBar, List<String> ids, Set<Connection> beforeConnections);
 
     public boolean equals(Object obj) {
         return (this.filters.equals(((Task)obj).getFilters()) &&
                 this.getClass().getName().equals(((Task)obj).getClass().getName()));
     }
+
+    public abstract Set execute(String text, int chatDelay, String girlId, String filters, Set setIncremented);
+
+    public abstract Set execute(String text, int chatDelay, String filters, String girlId,
+                                List<String> ids, Set setIncremented);
 }

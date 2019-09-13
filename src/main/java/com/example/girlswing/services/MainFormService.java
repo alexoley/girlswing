@@ -24,7 +24,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -224,22 +223,31 @@ public class MainFormService {
         Set setForEachIteration;
         for(List taskList : chatSendForm.getTaskList()){
             setForEachIteration=((Task)taskList.get(0)).execute(((Task)taskList.get(0)).getText(), chatDelay,
-                    girlId, ((Task)taskList.get(0)).getFilters());
-            List<String> ids = setForEachIteration.stream().filter(conn -> conn instanceof Connection)
-                    .map(Connection.class::cast)
-                    .filter(conn -> Objects.nonNull(conn.getIdMale()))
-                    .map(conn -> conn.getIdMale).collect(Collectors.toList());
-            for ( Object task : taskList.subList( 1, taskList.size() ) )
-            {
-                ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-                Runnable runnableTask = () -> ((Task)task).execute(((Task)task).getText(), chatDelay,
-                        ((Task)task).getFilters(), girlId, ids);
-                ScheduledFuture<?> future = executor.schedule(runnableTask, chatDelay*60L, TimeUnit.SECONDS);
-                try {
-                    executor.awaitTermination(1, TimeUnit.HOURS);
+                    girlId, ((Task)taskList.get(0)).getFilters(),setIncremented);
+            List<String> ids = new LinkedList<>();
+            for(Object conn : setForEachIteration){
+                ids.add(((Connection)conn).getIdMale());
+            }
 
-                } catch (Exception e) {
-                    e.printStackTrace();
+            /*TODO: Make lambda that can cast and collect man ids to list*/
+            /*List<String> ids = setForEachIteration.stream()
+                   *//* .filter(conn -> conn instanceof Connection)
+                    .map(Connection.class::cast)*//*
+                    //.filter(conn -> Objects.nonNull(conn.getIdMale()))
+                    .map(conn -> ((Connection)conn).getIdMale()).collect(Collectors.toList());*/
+            if(!ids.isEmpty()) {
+                for (Object task : taskList.subList(1, taskList.size())) {
+                    ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+                    Runnable runnableTask = () -> ((Task) task).execute(((Task) task).getText(), chatDelay,
+                            ((Task) task).getFilters(), girlId, ids, setIncremented);
+                    ScheduledFuture<?> future = executor.schedule(runnableTask, chatDelay * 60L, TimeUnit.SECONDS);
+                    try {
+                        executor.shutdown();
+                        executor.awaitTermination(1, TimeUnit.HOURS);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             setIncremented.addAll(setForEachIteration);

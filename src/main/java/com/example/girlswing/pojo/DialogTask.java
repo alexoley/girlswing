@@ -4,15 +4,10 @@ import com.example.girlswing.exceptions.ConnectionEmptyException;
 import com.example.girlswing.services.ConnectionService;
 import com.example.girlswing.services.MainFormService;
 import com.example.girlswing.utils.SpringUtils;
-import com.sun.xml.internal.bind.v2.TODO;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import javax.swing.*;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Getter
@@ -34,23 +29,18 @@ public class DialogTask extends Task {
     }
 
     @Override
-    public Set execute(String text, long delay, String girlId, String filters){
-        return execute(text, delay, girlId, filters, null, null);
+    public Set execute(String text, int chatDelay, String girlId, String filters, Set setIncremented) {
+        return execute(text, chatDelay, girlId, filters,null,  null, setIncremented);
     }
 
     @Override
-    public Set execute(String text, long delay, String girlId, String filters, JProgressBar progressBar) {
-        return execute(text, delay, girlId, filters, progressBar, null);
+    public Set execute(String text, int chatDelay, String filters, String girlId, List<String> ids, Set setIncremented) {
+        return execute(text, chatDelay, girlId, filters,null,  ids, setIncremented);
     }
 
     @Override
     public Set execute(String text, long delay, String girlId, String filters,
-                         List<String> ids){
-        return execute(text, delay, girlId, filters, null, ids);
-    }
-
-    public Set execute(String text, long delay, String girlId, String filters,
-                        JProgressBar progressBar, List<String> ids){
+                        JProgressBar progressBar, List<String> ids, Set<Connection> beforeConnections){
 
         /*TODO: Come up with, how to delete this SpringUtils calls*/
         ConnectionService connectionService = SpringUtils.getBean(ConnectionService.class);
@@ -100,6 +90,7 @@ public class DialogTask extends Task {
                 }
                 while (true);
                 oneRun.removeAll(uniqueConnections);
+                oneRun.removeAll(beforeConnections);
                 mainFormService.sendToAllFromList(oneRun.stream().filter(conn -> Objects.nonNull(conn.getIdMale()))
                                 .map(conn -> conn.getIdMale()).collect(Collectors.toList()),
                         text, girlId);
