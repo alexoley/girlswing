@@ -24,7 +24,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 @Component
 @Slf4j
@@ -35,6 +37,9 @@ public class MainForm extends JFrame {
 
     @Autowired
     ChatSendForm chatSendForm;
+
+    @Autowired
+    MailSendForm mailSendForm;
 
     @Autowired
     ChatSendFormService chatSendFormService;
@@ -54,17 +59,21 @@ public class MainForm extends JFrame {
 
     private DefaultListModel mailModel;
 
-    private JPanel chatScrollPanel;
+    private JPanel chatScrollPanel, mailScrollPanel;
 
     private JPanel distributionPANEL;
 
-    private JScrollPane chatScrollPane;
+    private JScrollPane chatScrollPane, mailScrollPane;
 
-    private JSlider chatTimer;
+    private JSlider chatTimer, mailTimer;
 
     JButton chatButton, startChatButton, pauseChatButton, stopChatButton;
 
-    ArrayList<JButton> buttonsToDisable = new ArrayList<>();
+    JButton mailButton, startMailButton, pauseMailButton, stopMailButton;
+
+    /*ArrayList<JButton> chatButtonsToDisable = new ArrayList<>();
+
+    ArrayList<JButton> mailButtonsToDisable = new ArrayList<>();*/
 
     MainForm(@Value("${application.icon:}") String appIcon) {
         setSize(1200,800);
@@ -129,10 +138,11 @@ public class MainForm extends JFrame {
         JPanel chatPanel = new JPanel();
         JLabel chatLabel = new JLabel("Chat");
         chatLabel.setBorder(BorderFactory.createMatteBorder(0,0,1,0, Color.BLACK));
-        JPanel buttonsPanel = new JPanel();
-        JPanel startStopPanel = new JPanel();
+        JPanel chatButtonsPanel = new JPanel();
+        JPanel chatStartStopPanel = new JPanel();
         chatTimer = new JSlider(2,4,3);
         chatTimer.setMajorTickSpacing(1);
+        chatTimer.setPaintLabels(true);
         chatButton = new JButton("Add new chat message");
 
         startChatButton = new JButton("Start");
@@ -148,19 +158,19 @@ public class MainForm extends JFrame {
         stopChatButton.setForeground(MaterialColors.RED_A400);
 
         //fill start and stop button to panel
-        //startStopPanel.setLayout();
-        startStopPanel.add(startChatButton);
-        startStopPanel.add(pauseChatButton);
-        startStopPanel.add(stopChatButton);
+        //chatStartStopPanel.setLayout();
+        chatStartStopPanel.add(startChatButton);
+        chatStartStopPanel.add(pauseChatButton);
+        chatStartStopPanel.add(stopChatButton);
 
-        buttonsPanel.setLayout(new BorderLayout());
-        buttonsPanel.add(chatTimer, BorderLayout.NORTH);
-        buttonsPanel.add(chatButton, BorderLayout.CENTER);
-        buttonsPanel.add(startStopPanel, BorderLayout.SOUTH);
+        chatButtonsPanel.setLayout(new BorderLayout());
+        chatButtonsPanel.add(chatTimer, BorderLayout.NORTH);
+        chatButtonsPanel.add(chatButton, BorderLayout.CENTER);
+        chatButtonsPanel.add(chatStartStopPanel, BorderLayout.SOUTH);
 
-        chatModel = new DefaultListModel<>();
-        JList chatList = new JList(chatModel);
-        //temp
+        /*chatModel = new DefaultListModel<>();
+        JList chatList = new JList(chatModel);*/
+
         chatScrollPanel = new JPanel();
         chatScrollPanel.setLayout(new GridLayout(8, 1));
         chatScrollPane = new JScrollPane(chatScrollPanel);
@@ -177,14 +187,24 @@ public class MainForm extends JFrame {
         startChatButton.addActionListener((ActionEvent event)  -> {
             JButton source = (JButton) event.getSource();
             try {
-                //chatScrollPanel.
                 String[] massiveOfGirls = ((String) listOfGirls.getSelectedValue()).split(":", 0);
-                buttonsToDisable.add(source);
-                buttonsToDisable.add(chatButton);
-                /*source.setEnabled(false);
-                chatButton.setEnabled(false);*/
-                new Thread(()->mainFormService.sendChatMessagesToAllTasks(chatTimer.getValue(),
-                        massiveOfGirls[massiveOfGirls.length-1], buttons)).start();
+                java.util.List<JButton> buttons = new LinkedList();
+                for(java.awt.Component comp: chatScrollPanel.getComponents()){
+                    buttons.add((JButton)((JPanel)comp).getComponents()[1]);
+                }
+                buttons.add(source);
+                buttons.add(chatButton);
+                buttons.forEach(button -> button.setEnabled(false));
+                new Thread(()-> {
+                    try {
+                        mainFormService.sendChatMessagesToAllTasks(chatTimer.getValue(),
+                                massiveOfGirls[massiveOfGirls.length-1], buttons);
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
             }
             catch (NullPointerException e){
                 JOptionPane.showMessageDialog(this,"Select a girl",
@@ -192,11 +212,15 @@ public class MainForm extends JFrame {
             }
         });
 
-        chatPanel.setPreferredSize(new Dimension(400,700));
+        pauseChatButton.addActionListener((ActionEvent event)  -> {});
+
+        stopChatButton.addActionListener((ActionEvent event)  -> {});
+
+        chatPanel.setPreferredSize(new Dimension(300,700));
         chatPanel.setLayout(new BorderLayout());
         chatPanel.add(chatLabel, BorderLayout.NORTH);
         chatPanel.add(chatScrollPane, BorderLayout.CENTER);
-        chatPanel.add(buttonsPanel, BorderLayout.SOUTH);
+        chatPanel.add(chatButtonsPanel, BorderLayout.SOUTH);
 
         chatPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 
@@ -204,25 +228,94 @@ public class MainForm extends JFrame {
     }
 
     private void setMailPanel(){
+        JPanel mailPanel = new JPanel();
         JLabel mailLabel = new JLabel("Mail");
         mailLabel.setBorder(BorderFactory.createMatteBorder(0,0,1,0, Color.BLACK));
-        JButton mailButton = new JButton("Add new mail message");
-        JPanel mailPanel = new JPanel();
+        JPanel mailButtonsPanel = new JPanel();
+        JPanel mailStartStopPanel = new JPanel();
+        mailTimer = new JSlider(2,4,3);
+        mailTimer.setMajorTickSpacing(1);
+        mailTimer.setPaintLabels(true);
+        mailButton = new JButton("Add new mail message");
+
+        startMailButton = new JButton("Start");
+        MaterialUIMovement.add (startMailButton, MaterialColors.GREEN_A400);
+        startMailButton.setForeground(MaterialColors.GREEN_A400);
+
+        pauseMailButton = new JButton("Pause");
+        MaterialUIMovement.add (pauseMailButton, MaterialColors.YELLOW_A400);
+        pauseMailButton.setForeground(MaterialColors.YELLOW_A400);
+
+        stopMailButton = new JButton("Stop");
+        MaterialUIMovement.add (stopMailButton, MaterialColors.RED_A400);
+        stopMailButton.setForeground(MaterialColors.RED_A400);
+
+        //fill start and stop button to panel
+        //startStopPanel.setLayout();
+        mailStartStopPanel.add(startMailButton);
+        mailStartStopPanel.add(pauseMailButton);
+        mailStartStopPanel.add(stopMailButton);
+
+        mailButtonsPanel.setLayout(new BorderLayout());
+        mailButtonsPanel.add(mailTimer, BorderLayout.NORTH);
+        mailButtonsPanel.add(mailButton, BorderLayout.CENTER);
+        mailButtonsPanel.add(mailStartStopPanel, BorderLayout.SOUTH);
+
+        mailScrollPanel = new JPanel();
+        mailScrollPanel.setLayout(new GridLayout(8, 1));
+        mailScrollPane = new JScrollPane(mailScrollPanel);
+        mailScrollPane.setWheelScrollingEnabled(true);
+
         mailButton.setBorder(MaterialBorders.LIGHT_SHADOW_BORDER);
         MaterialUIMovement.add (mailButton, MaterialColors.GRAY_700);
         mailButton.addActionListener((ActionEvent event)  -> {
-
+            mailSendForm.setVisible(true);
+            mailSendForm.setValuesToFilters();
         });
 
-        mailModel = new DefaultListModel<>();
-        JList mailList = new JList(mailModel);
+        /*mailModel = new DefaultListModel<>();
+        JList mailList = new JList(mailModel);*/
+
+        startMailButton.addActionListener((ActionEvent event)  -> {
+            JButton source = (JButton) event.getSource();
+            try {
+                String[] massiveOfGirls = ((String) listOfGirls.getSelectedValue()).split(":", 0);
+                java.util.List<JButton> buttons = new LinkedList();
+                for(java.awt.Component comp: mailScrollPanel.getComponents()){
+                    buttons.add((JButton)((JPanel)comp).getComponents()[1]);
+                }
+                buttons.add(source);
+                buttons.add(mailButton);
+                buttons.forEach(button -> button.setEnabled(false));
+                new Thread(()-> {
+                    try {
+                        mainFormService.sendMailMessagesToAllTasks(mailTimer.getValue(),
+                                massiveOfGirls[massiveOfGirls.length-1], buttons);
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+            }
+            catch (NullPointerException e){
+                JOptionPane.showMessageDialog(this,"Select a girl",
+                        "Reminder",JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
+        pauseChatButton.addActionListener((ActionEvent event)  -> {});
+
+        stopChatButton.addActionListener((ActionEvent event)  -> {});
 
         mailPanel.setPreferredSize(new Dimension(400,700));
         mailPanel.setLayout(new BorderLayout());
         mailPanel.add(mailLabel, BorderLayout.NORTH);
-        mailPanel.add(mailList, BorderLayout.CENTER);
-        mailPanel.add(mailButton, BorderLayout.SOUTH);
+        mailPanel.add(mailScrollPane, BorderLayout.CENTER);
+        mailPanel.add(mailButtonsPanel, BorderLayout.SOUTH);
+
         mailPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+
         distributionPANEL.add(mailPanel, BorderLayout.LINE_END);
     }
     public void setElementsToListOfGirls(ListModel elements) {
@@ -233,7 +326,7 @@ public class MainForm extends JFrame {
         JPanel panel = (JPanel) chatScrollPane.getViewport().getView();
         JPanel innerPanel = new JPanel();
         JProgressBar pb = new JProgressBar(SwingConstants.HORIZONTAL);
-        pb.setString(text);
+        pb.setString(text.substring(0, 40));
         pb.setStringPainted(true);
         innerPanel.add(pb);
         CloseButton closeButton = new CloseButton("✗");
@@ -244,8 +337,8 @@ public class MainForm extends JFrame {
         panel.add(innerPanel);
         ((GridLayout)panel.getLayout()).setRows(((GridLayout)panel.getLayout()).getRows()+1);
         panel.revalidate();
-        Task newTask = taskFactory.getTask(chatSendForm);
-        newTask.setProgressBar(pb);
+        Task newTask = taskFactory.getTask(chatSendForm, pb);
+        newTask.setText(text);
         pb.setToolTipText(newTask.getName());
         closeButton.setTask(newTask);
         closeButton.addActionListener((ActionEvent event)  -> {
@@ -256,9 +349,39 @@ public class MainForm extends JFrame {
             panel.repaint();
             panel.revalidate();
         });
-        buttonsToDisable.add(closeButton);
+        //chatButtonsToDisable.add(closeButton);
         return newTask;
         //chatModel.addElement(text);
+    }
+
+    public Task addElementToMailList(String text, MailSendForm mailSendForm){
+        JPanel panel = (JPanel) mailScrollPane.getViewport().getView();
+        JPanel innerPanel = new JPanel();
+        JProgressBar pb = new JProgressBar(SwingConstants.HORIZONTAL);
+        pb.setString(text.substring(0, 40));
+        pb.setStringPainted(true);
+        innerPanel.add(pb);
+        CloseButton closeButton = new CloseButton("✗");
+
+        MaterialUIMovement.add (closeButton, MaterialColors.DEEP_ORANGE_300);
+
+        innerPanel.add(closeButton);
+        panel.add(innerPanel);
+        ((GridLayout)panel.getLayout()).setRows(((GridLayout)panel.getLayout()).getRows()+1);
+        panel.revalidate();
+        Task newTask = taskFactory.getMailTask(mailSendForm, pb);
+        pb.setToolTipText(newTask.getName());
+        closeButton.setTask(newTask);
+        closeButton.addActionListener((ActionEvent event)  -> {
+            Task t = ((CloseButton)event.getSource()).getTask();
+            mailSendForm.deleteTaskFromList(t);
+            innerPanel.removeAll();
+            panel.remove(innerPanel);
+            panel.repaint();
+            panel.revalidate();
+        });
+        //mailButtonsToDisable.add(closeButton);
+        return newTask;
     }
 
 }

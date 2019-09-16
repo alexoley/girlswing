@@ -2,6 +2,7 @@ package com.example.girlswing.services;
 
 
 import com.example.girlswing.UI.ChatSendForm;
+import com.example.girlswing.UI.MailSendForm;
 import com.example.girlswing.UI.MainForm;
 import com.example.girlswing.pojo.Connection;
 import com.example.girlswing.pojo.Task;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -57,6 +59,12 @@ public class MainFormService {
 
     @Autowired
     ChatSendForm chatSendForm;
+
+    @Autowired
+    MailSendForm mailSendForm;
+
+    boolean suspended=false;
+    boolean stopped=false;
 
     public void sendOld(String idTo, String text) {
         Date date = new Date();
@@ -152,11 +160,18 @@ public class MainFormService {
 
     }
 
-    public void sendToAllFromList(List<String> ids, String text, String girlId, JProgressBar progressBar) {
+    public void sendToAllChatFromList(List<String> ids, String text, String girlId, JProgressBar progressBar) throws InvocationTargetException, InterruptedException {
         final long xRateLimitReset = ((long) masterDataLoader.get("X-Rate-Limit-Reset") + 1L) * 1000L;
         HttpResponse response;
         int i = 0;
         for (String id : ids) {
+
+            /*synchronized (this) {
+                while (suspended)
+                    wait();
+                if (stopped)
+                    break;
+            }*/
             i++;
             final int j = i;
             response = requestService.send(id, text, girlId);
@@ -178,7 +193,38 @@ public class MainFormService {
                 requestService.send(id, text, girlId);
             }
             if (progressBar != null) {
-                EventQueue.invokeLater(() -> progressBar.setValue(j));
+                EventQueue.invokeAndWait(() -> progressBar.setValue(j));
+            }
+        }
+    }
+
+    public void sendToAllMailFromList(List<String> ids, String text, String girlId, JProgressBar progressBar) throws InvocationTargetException, InterruptedException {
+        final long xRateLimitReset = ((long) masterDataLoader.get("X-Rate-Limit-Reset") + 1L) * 1000L;
+        HttpResponse response;
+        int i = 0;
+        for (String id : ids) {
+            i++;
+            final int j = i;
+            response = requestService.sendMail(id, text, girlId);
+            if (responseService.getSecondsToWaitUntilRateLimitIncrease(response) > 0) {
+                try {
+                    Thread.sleep(xRateLimitReset);
+                } catch (InterruptedException e) {
+                    log.error("Interrupted exception in send to all from list");
+                    e.printStackTrace();
+                }
+            }
+            if (!responseService.isMessageResponseOk(response)) {
+                try {
+                    Thread.sleep(xRateLimitReset);
+                } catch (InterruptedException e) {
+                    log.error("Interrupted exception in send to all from list");
+                    e.printStackTrace();
+                }
+                requestService.sendMail(id, text, girlId);
+            }
+            if (progressBar != null) {
+                EventQueue.invokeAndWait(() -> progressBar.setValue(j));
             }
         }
     }
@@ -217,7 +263,7 @@ public class MainFormService {
         }
     }
 
-    public void sendChatMessagesToAllTasks(int chatDelay, String girlId, JButton... buttons) {
+    public void sendChatMessagesToAllTasks(int chatDelay, String girlId, List<JButton> buttons) throws InvocationTargetException, InterruptedException {
         Set setIncremented = new HashSet();
         Set setForEachIteration;
         for (List taskList : chatSendForm.getTaskList()) {
@@ -241,9 +287,17 @@ public class MainFormService {
                 Object task = it.next();
                 if (!ids.isEmpty()) {
                     ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-                    Runnable runnableTask = () -> ((Task) task).execute(((Task) task).getFilters(),
-                            ((Task) task).getText(), ids, ((Task) task).getProgressBar(), chatDelay,
-                            girlId, setIncremented);
+                    Runnable runnableTask = () -> {
+                        try {
+                            ((Task) task).execute(((Task) task).getFilters(),
+                                    ((Task) task).getText(), ids, ((Task) task).getProgressBar(), chatDelay,
+                                    girlId, setIncremented);
+                        } catch (InvocationTargetException e) {
+                            e.printStackTrace();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    };
                     ScheduledFuture<?> future = executor.schedule(runnableTask, chatDelay * 60L, TimeUnit.SECONDS);
                     try {
                         executor.shutdown();
@@ -254,7 +308,7 @@ public class MainFormService {
                     }
                 } else {
                     if (((Task) task).getProgressBar() != null) {
-                        EventQueue.invokeLater(() ->
+                        EventQueue.invokeAndWait(() ->
                         {
                             ((Task) task).getProgressBar().setMaximum(1);
                             ((Task) task).getProgressBar().setValue(1);
@@ -264,8 +318,64 @@ public class MainFormService {
             }
             setIncremented.addAll(setForEachIteration);
         }
-        for(JButton button : buttons){
-            button.setEnabled(true);
+        buttons.forEach(button -> button.setEnabled(true));
+    }
+
+    public void sendMailMessagesToAllTasks(int mailDelay, String girlId, List<JButton> buttons) throws InvocationTargetException, InterruptedException {
+        Set setIncremented = new HashSet();
+        Set setForEachIteration;
+        for (List taskList : mailSendForm.getTaskList()) {
+            setForEachIteration = ((Task) taskList.get(0)).executeMail(((Task) taskList.get(0)).getFilters(),
+                    ((Task) taskList.get(0)).getText(), ((Task) taskList.get(0)).getProgressBar(), mailDelay,
+                    girlId, setIncremented);
+            List<String> ids = new LinkedList<>();
+            for (Object conn : setForEachIteration) {
+                ids.add(((Connection) conn).getIdMale());
+            }
+
+            /*TODO: Make lambda that can cast and collect man ids to list*/
+            /*List<String> ids = setForEachIteration.stream()
+             *//* .filter(conn -> conn instanceof Connection)
+                    .map(Connection.class::cast)*//*
+                    //.filter(conn -> Objects.nonNull(conn.getIdMale()))
+                    .map(conn -> ((Connection)conn).getIdMale()).collect(Collectors.toList());*/
+            Iterator it = taskList.iterator();
+            it.next();
+            while (it.hasNext()) {
+                Object task = it.next();
+                if (!ids.isEmpty()) {
+                    ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+                    Runnable runnableTask = () -> {
+                        try {
+                            ((Task) task).executeMail(((Task) task).getFilters(),
+                                    ((Task) task).getText(), ids, ((Task) task).getProgressBar(), mailDelay,
+                                    girlId, setIncremented);
+                        } catch (InvocationTargetException e) {
+                            e.printStackTrace();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    };
+                    ScheduledFuture<?> future = executor.schedule(runnableTask, mailDelay * 60L, TimeUnit.SECONDS);
+                    try {
+                        executor.shutdown();
+                        executor.awaitTermination(1, TimeUnit.HOURS);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    if (((Task) task).getProgressBar() != null) {
+                        EventQueue.invokeAndWait(() ->
+                        {
+                            ((Task) task).getProgressBar().setMaximum(1);
+                            ((Task) task).getProgressBar().setValue(1);
+                        });
+                    }
+                }
+            }
+            setIncremented.addAll(setForEachIteration);
         }
+        buttons.forEach(button -> button.setEnabled(true));
     }
 }

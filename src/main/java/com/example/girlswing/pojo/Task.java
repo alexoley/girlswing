@@ -3,6 +3,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.swing.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,16 +47,27 @@ public abstract class Task {
         this.progressBar=progressBar;
     }
 
-    abstract public Set execute(String filters, String text, int chatDelay, String girlId,  Set setIncremented);
+    abstract public Set execute(String filters, String text, int chatDelay, String girlId,  Set setIncremented) throws InvocationTargetException, InterruptedException;
 
     abstract public Set execute(String filters, String text, List<String> ids, int chatDelay,  String girlId,
-                                 Set setIncremented);
+                                 Set setIncremented) throws InvocationTargetException, InterruptedException;
 
     abstract public Set execute(String filters, String text, JProgressBar progressBar,
-                                long delay, String girlId, Set<Connection> beforeConnections);
+                                long delay, String girlId, Set<Connection> beforeConnections) throws InvocationTargetException, InterruptedException;
 
     abstract public Set execute(String filters, String text, List<String> ids, JProgressBar progressBar,
-                                long delay, String girlId, Set<Connection> beforeConnections);
+                                long delay, String girlId, Set<Connection> beforeConnections) throws InvocationTargetException, InterruptedException;
+
+    abstract public Set executeMail(String filters, String text, int mailDelay, String girlId,  Set setIncremented) throws InvocationTargetException, InterruptedException;
+
+    abstract public Set executeMail(String filters, String text, List<String> ids, int mailDelay,  String girlId,
+                                Set setIncremented) throws InvocationTargetException, InterruptedException;
+
+    abstract public Set executeMail(String filters, String text, JProgressBar progressBar,
+                                long delay, String girlId, Set<Connection> beforeConnections) throws InvocationTargetException, InterruptedException;
+
+    abstract public Set executeMail(String filters, String text, List<String> ids, JProgressBar progressBar,
+                                long delay, String girlId, Set<Connection> beforeConnections) throws InvocationTargetException, InterruptedException;
 
     public boolean equals(Object obj) {
         return (this.filters.equals(((Task)obj).getFilters()) &&

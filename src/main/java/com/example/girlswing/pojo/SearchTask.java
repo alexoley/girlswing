@@ -44,5 +44,27 @@ public class SearchTask extends Task {
         return new HashSet();
     }
 
+    @Override
+    public Set executeMail(String filters, String text, int mailDelay, String girlId,  Set setIncremented) {
+        return executeMail(filters, text, (List<String>) null, mailDelay, girlId, setIncremented);
+    }
+
+    @Override
+    public Set executeMail(String filters, String text, List<String> ids, int mailDelay,  String girlId,  Set setIncremented) {
+        return executeMail(filters, text, ids, null ,mailDelay, girlId, setIncremented);
+    }
+
+    @Override
+    public Set executeMail(String filters, String text, JProgressBar progressBar,
+                       long mailDelay, String girlId, Set<Connection> setIncremented){
+        return executeMail(filters, text, null, progressBar ,mailDelay, girlId, setIncremented);
+    }
+
+    @Override
+    public Set executeMail(String filters, String text, List<String> ids, JProgressBar progressBar,
+                       long mailDelay, String girlId, Set<Connection> beforeConnections) {
+        return new HashSet();
+    }
+
 
 }

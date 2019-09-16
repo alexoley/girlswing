@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
@@ -114,6 +115,23 @@ public class RequestService {
 
         return basicRequest(json,
                 siteApiLink+"/operator/add-activity/message/"+idTo,
+                true, userAgent, "post");
+    }
+
+    public HttpResponse sendMail(String idTo, String text, String girlId){
+        return sendMail(idTo, text, "", girlId);
+    }
+
+    //@Async
+    public HttpResponse sendMail(String idTo, String text, String userAgent, String girlId){
+        String json = new JSONObject()
+                .put("email", new JSONObject().put("content", text).put("from", girlId).put("to", idTo).put("title", ""))
+                .put("images", new ArrayList<>())
+                .put("videos", new ArrayList<>())
+                .toString();
+
+        return basicRequest(json,
+                siteApiLink+"/correspondence/send",
                 true, userAgent, "post");
     }
 
