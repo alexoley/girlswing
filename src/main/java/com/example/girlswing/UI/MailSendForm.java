@@ -40,7 +40,7 @@ public class MailSendForm extends JFrame {
 
     private JTextField textField;
 
-    public java.util.List<java.util.List<Task>> taskList = new LinkedList<>();
+    public java.util.List<java.util.List<Task>> listOfTasksList = new LinkedList<>();
 
     MailSendForm(@Value("${application.icon:}") String appIcon){
         try {
@@ -168,13 +168,13 @@ public class MailSendForm extends JFrame {
 
     private void addTaskToList(Task newTask){
         boolean wasSet=false;
-        if(taskList.isEmpty()) {
+        if(listOfTasksList.isEmpty()) {
             ArrayList newTaskArray = new ArrayList<>();
             newTaskArray.add(newTask);
-            taskList.add(newTaskArray);
+            listOfTasksList.add(newTaskArray);
         }
         else {
-            for (java.util.List listOfTasks : taskList) {
+            for (java.util.List listOfTasks : listOfTasksList) {
                 if(newTask.equals(listOfTasks.get(0))){
                     listOfTasks.add(newTask);
                     wasSet=true;
@@ -183,19 +183,19 @@ public class MailSendForm extends JFrame {
             if(!wasSet){
                 ArrayList newtaskArray = new ArrayList<>();
                 newtaskArray.add(newTask);
-                taskList.add(newtaskArray);
+                listOfTasksList.add(newtaskArray);
             }
         }
     }
 
     public void deleteTaskFromList(Task deleteTask){
-        for (java.util.List listOfTasks : taskList) {
+        for (java.util.List listOfTasks : listOfTasksList) {
             if(deleteTask.equals(listOfTasks.get(0))){
                 for(int i=0; i<listOfTasks.size(); i++){
                     if(deleteTask.getId()==((Task)listOfTasks.get(i)).getId()){
                         listOfTasks.remove(i);
                         if(listOfTasks.isEmpty()){
-                            taskList.remove(listOfTasks);
+                            listOfTasksList.remove(listOfTasks);
                         }
                     }
                 }

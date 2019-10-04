@@ -21,6 +21,9 @@ public abstract class Task {
     protected Calendar time;
     protected JProgressBar progressBar;
 
+    public Task(){
+
+    }
     public Task(long id, String name, String filters, String text) {
         this.id=id;
         this.name = name;
@@ -70,8 +73,10 @@ public abstract class Task {
                                 long delay, String girlId, Set<Connection> beforeConnections) throws InvocationTargetException, InterruptedException;
 
     public boolean equals(Object obj) {
+        String a = this.getClass().getName();
+        String b = ((Task)obj).getClass().getName();
         return (this.filters.equals(((Task)obj).getFilters()) &&
-                this.getClass().getName().equals(((Task)obj).getClass().getName()));
+                a.equals(b));
     }
 
 }

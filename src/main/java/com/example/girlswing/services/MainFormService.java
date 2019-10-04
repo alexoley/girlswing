@@ -10,6 +10,8 @@ import com.example.girlswing.utils.CookieP;
 import com.example.girlswing.utils.MasterDataLoader;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.apache.http.HttpResponse;
@@ -63,8 +65,21 @@ public class MainFormService {
     @Autowired
     MailSendForm mailSendForm;
 
-    boolean suspended=false;
-    boolean stopped=false;
+    @Setter
+    volatile boolean chatSuspended=false;
+    @Setter
+    volatile boolean chatStopped=false;
+
+    @Setter @Getter
+    volatile boolean chatWasStopped=false;
+
+    @Setter
+    volatile boolean mailSuspended=false;
+    @Setter
+    volatile boolean mailStopped=false;
+
+    @Setter @Getter
+    volatile boolean mailWasStopped=false;
 
     public void sendOld(String idTo, String text) {
         Date date = new Date();
@@ -166,12 +181,20 @@ public class MainFormService {
         int i = 0;
         for (String id : ids) {
 
-            /*synchronized (this) {
-                while (suspended)
+            synchronized (mainForm) {
+                if (chatSuspended){
+                    mainForm.getStartChatButton().setEnabled(true);
+                    mainForm.getPauseChatButton().setEnabled(false);
+                    chatWasStopped = true;
+                }
+                while (chatSuspended) {
                     wait();
-                if (stopped)
+                    //Thread.sleep(2000);
+                }
+                if (chatStopped)
                     break;
-            }*/
+            }
+
             i++;
             final int j = i;
             response = requestService.send(id, text, girlId);
@@ -203,6 +226,21 @@ public class MainFormService {
         HttpResponse response;
         int i = 0;
         for (String id : ids) {
+
+            synchronized (mainForm) {
+                if (mailSuspended){
+                    mainForm.getStartMailButton().setEnabled(true);
+                    mainForm.getPauseMailButton().setEnabled(false);
+                    mailWasStopped = true;
+                }
+                while (mailSuspended) {
+                    wait();
+                    //Thread.sleep(2000);
+                }
+                if (mailStopped)
+                    break;
+            }
+
             i++;
             final int j = i;
             response = requestService.sendMail(id, text, girlId);
@@ -266,7 +304,7 @@ public class MainFormService {
     public void sendChatMessagesToAllTasks(int chatDelay, String girlId, List<JButton> buttons) throws InvocationTargetException, InterruptedException {
         Set setIncremented = new HashSet();
         Set setForEachIteration;
-        for (List taskList : chatSendForm.getTaskList()) {
+        for (List taskList : chatSendForm.getListOfTasksList()) {
             setForEachIteration = ((Task) taskList.get(0)).execute(((Task) taskList.get(0)).getFilters(),
                     ((Task) taskList.get(0)).getText(), ((Task) taskList.get(0)).getProgressBar(), chatDelay,
                     girlId, setIncremented);
@@ -324,7 +362,7 @@ public class MainFormService {
     public void sendMailMessagesToAllTasks(int mailDelay, String girlId, List<JButton> buttons) throws InvocationTargetException, InterruptedException {
         Set setIncremented = new HashSet();
         Set setForEachIteration;
-        for (List taskList : mailSendForm.getTaskList()) {
+        for (List taskList : mailSendForm.getListOfTasksList()) {
             setForEachIteration = ((Task) taskList.get(0)).executeMail(((Task) taskList.get(0)).getFilters(),
                     ((Task) taskList.get(0)).getText(), ((Task) taskList.get(0)).getProgressBar(), mailDelay,
                     girlId, setIncremented);

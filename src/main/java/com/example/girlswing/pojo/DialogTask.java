@@ -6,6 +6,11 @@ import com.example.girlswing.services.MainFormService;
 import com.example.girlswing.utils.SpringUtils;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
@@ -16,7 +21,20 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @Slf4j
+@Component
+@Scope("prototype")
 public class DialogTask extends Task {
+
+    @Autowired
+    ConnectionService connectionService;
+
+    @Autowired
+    MainFormService mainFormService;
+
+
+    public DialogTask(){
+
+    }
 
     public DialogTask(long id, String name, String filters, String text) {
         super(id, name, filters, text);
@@ -52,8 +70,8 @@ public class DialogTask extends Task {
                        long delay, String girlId, Set<Connection> beforeConnections) throws InvocationTargetException, InterruptedException {
 
         /*TODO: Come up with, how to delete this SpringUtils calls*/
-        ConnectionService connectionService = SpringUtils.getBean(ConnectionService.class);
-        MainFormService mainFormService = SpringUtils.getBean(MainFormService.class);
+        /*ConnectionService connectionService = SpringUtils.getBean(ConnectionService.class);
+        MainFormService mainFormService = SpringUtils.getBean(MainFormService.class);*/
 
 
         Set<Connection> uniqueConnections = new HashSet<>();

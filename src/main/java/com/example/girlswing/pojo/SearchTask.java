@@ -2,13 +2,23 @@ package com.example.girlswing.pojo;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import javax.swing.*;
 import java.util.*;
 
 @Getter
 @Setter
+@Slf4j
+@Component
+@Scope("prototype")
 public class SearchTask extends Task {
+
+    public SearchTask(){
+
+    }
 
     public SearchTask(long id, String name, String filters, String text) {
         super(id, name, filters, text);

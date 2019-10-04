@@ -2,7 +2,6 @@ package com.example.girlswing.UI;
 
 import com.example.girlswing.pojo.Task;
 import com.example.girlswing.services.ChatSendFormService;
-import com.example.girlswing.utils.TaskFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -37,12 +36,12 @@ public class ChatSendForm extends JFrame {
     private JComboBox country, lastOnline, education, maritialStatus, children, bodyType, religion, drinking, smoking;
 
 
-    private JCheckBox withPhoto, wantsMoreChildren, activeDialogs, bookmarked;
+    private JCheckBox withPhoto, wantsMoreChildren, activeDialogs, bookmarked, allDialogs;
 
 
     private JTextField textField;
 
-    public java.util.List<java.util.List<Task>> taskList = new LinkedList<>();
+    public java.util.List<java.util.List<Task>> listOfTasksList = new LinkedList<>();
 
     ChatSendForm(@Value("${application.icon:}") String appIcon){
         try {
@@ -115,6 +114,25 @@ public class ChatSendForm extends JFrame {
         wantsMoreChildren = new JCheckBox("Wants More Children");
         activeDialogs = new JCheckBox("Active dialogs");
         bookmarked = new JCheckBox("Bookmarked");
+        allDialogs = new JCheckBox("All dialogs");
+        activeDialogs.addActionListener((ActionEvent event)  -> {
+            JCheckBox cb = (JCheckBox) event.getSource();
+            if (cb.isSelected()) {
+                bookmarked.setSelected(false);
+                allDialogs.setSelected(false);
+            } });
+        bookmarked.addActionListener((ActionEvent event)  -> {
+            JCheckBox cb = (JCheckBox) event.getSource();
+            if (cb.isSelected()) {
+                allDialogs.setSelected(false);
+                activeDialogs.setSelected(false);
+            } });
+        allDialogs.addActionListener((ActionEvent event)  -> {
+            JCheckBox cb = (JCheckBox) event.getSource();
+            if (cb.isSelected()) {
+                bookmarked.setSelected(false);
+                activeDialogs.setSelected(false);
+            } });
 
         //add labels to filter panels
         countryPanel.add(countryLabel, BorderLayout.NORTH);
@@ -148,7 +166,7 @@ public class ChatSendForm extends JFrame {
         filters.add(maritialStatusPanel); filters.add(childrenPanel); filters.add(bodyTypePanel);
         filters.add(religionPanel); filters.add(drinkingPanel); filters.add(smokingPanel);
         filters.add(withPhoto); filters.add(wantsMoreChildren); filters.add(activeDialogs);
-        filters.add(bookmarked);
+        filters.add(bookmarked); filters.add(allDialogs);
 
         filters.setLayout(new GridLayout(4,3));
         filters.setBounds(30, 10, 600, 400);
@@ -170,13 +188,13 @@ public class ChatSendForm extends JFrame {
 
     private void addTaskToList(Task newTask){
         boolean wasSet=false;
-        if(taskList.isEmpty()) {
+        if(listOfTasksList.isEmpty()) {
             ArrayList newTaskArray = new ArrayList<>();
             newTaskArray.add(newTask);
-            taskList.add(newTaskArray);
+            listOfTasksList.add(newTaskArray);
         }
         else {
-            for (java.util.List listOfTasks : taskList) {
+            for (java.util.List listOfTasks : listOfTasksList) {
                 if(newTask.equals(listOfTasks.get(0))){
                     listOfTasks.add(newTask);
                     wasSet=true;
@@ -185,19 +203,27 @@ public class ChatSendForm extends JFrame {
             if(!wasSet){
                 ArrayList newtaskArray = new ArrayList<>();
                 newtaskArray.add(newTask);
-                taskList.add(newtaskArray);
+                listOfTasksList.add(newtaskArray);
             }
         }
     }
 
     public void deleteTaskFromList(Task deleteTask){
-        for (java.util.List listOfTasks : taskList) {
+        //Use iterator because of java.util.ConcurrentModificationException
+        //for (java.util.List listOfTasks : listOfTasksList) {
+        for (Iterator iterator = listOfTasksList.iterator(); iterator.hasNext(); ) {
+            java.util.List listOfTasks = (java.util.List)iterator.next();
             if(deleteTask.equals(listOfTasks.get(0))){
-                for(int i=0; i<listOfTasks.size(); i++){
-                    if(deleteTask.getId()==((Task)listOfTasks.get(i)).getId()){
-                        listOfTasks.remove(i);
+                //for(int i=0; i<listOfTasks.size(); i++){
+                for (Iterator innerIterator = listOfTasks.iterator(); iterator.hasNext(); ) {
+                    Task task = (Task) innerIterator.next();
+                    /*if(deleteTask.getId()==((Task)listOfTasks.get(i)).getId()){
+                        listOfTasks.remove(i);*/
+                    if(deleteTask.getId()==task.getId()){
+                        innerIterator.remove();
                         if(listOfTasks.isEmpty()){
-                            taskList.remove(listOfTasks);
+                            //listOfTasksList.remove(listOfTasks);
+                            iterator.remove();
                         }
                     }
                 }

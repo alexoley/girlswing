@@ -8,6 +8,7 @@ import com.example.girlswing.services.MainFormService;
 import com.example.girlswing.utils.CloseButton;
 import com.example.girlswing.utils.MasterDataLoader;
 import com.example.girlswing.utils.TaskFactory;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import mdlaf.animation.MaterialUIMovement;
 import mdlaf.utils.MaterialBorders;
@@ -25,7 +26,6 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 @Component
@@ -67,9 +67,15 @@ public class MainForm extends JFrame {
 
     private JSlider chatTimer, mailTimer;
 
+    @Getter
     JButton chatButton, startChatButton, pauseChatButton, stopChatButton;
 
+    @Getter
     JButton mailButton, startMailButton, pauseMailButton, stopMailButton;
+
+    Thread chatThread;
+
+    Thread mailThread;
 
     /*ArrayList<JButton> chatButtonsToDisable = new ArrayList<>();
 
@@ -186,35 +192,50 @@ public class MainForm extends JFrame {
 
         startChatButton.addActionListener((ActionEvent event)  -> {
             JButton source = (JButton) event.getSource();
-            try {
-                String[] massiveOfGirls = ((String) listOfGirls.getSelectedValue()).split(":", 0);
-                java.util.List<JButton> buttons = new LinkedList();
-                for(java.awt.Component comp: chatScrollPanel.getComponents()){
-                    buttons.add((JButton)((JPanel)comp).getComponents()[1]);
-                }
-                buttons.add(source);
-                buttons.add(chatButton);
-                buttons.forEach(button -> button.setEnabled(false));
-                new Thread(()-> {
-                    try {
-                        mainFormService.sendChatMessagesToAllTasks(chatTimer.getValue(),
-                                massiveOfGirls[massiveOfGirls.length-1], buttons);
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }).start();
+            if(mainFormService.isChatWasStopped()){
+                mainFormService.setChatStopped(false);
+                mainFormService.setChatWasStopped(false);
+                pauseChatButton.setEnabled(true);
+                source.setEnabled(false);
             }
-            catch (NullPointerException e){
-                JOptionPane.showMessageDialog(this,"Select a girl",
-                        "Reminder",JOptionPane.INFORMATION_MESSAGE);
+            else {
+                try {
+                    mainFormService.setChatStopped(false);
+                    String[] massiveOfGirls = ((String) listOfGirls.getSelectedValue()).split(":", 0);
+                    java.util.List<JButton> buttons = new LinkedList();
+                    for (java.awt.Component comp : chatScrollPanel.getComponents()) {
+                        buttons.add((JButton) ((JPanel) comp).getComponents()[1]);
+                    }
+                    buttons.add(source);
+                    buttons.add(chatButton);
+                    buttons.forEach(button -> button.setEnabled(false));
+                    chatThread = new Thread(() -> {
+                        try {
+                            mainFormService.sendChatMessagesToAllTasks(chatTimer.getValue(),
+                                    massiveOfGirls[massiveOfGirls.length - 1], buttons);
+                        } catch (InvocationTargetException e) {
+                            e.printStackTrace();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    chatThread.start();
+                } catch (NullPointerException e) {
+                    JOptionPane.showMessageDialog(this, "Select a girl",
+                            "Reminder", JOptionPane.INFORMATION_MESSAGE);
+                }
             }
         });
 
-        pauseChatButton.addActionListener((ActionEvent event)  -> {});
+        pauseChatButton.addActionListener((ActionEvent event)  -> {
+            //synchronized (this) {mainFormService.setChatSuspended(true);}
+            //synchronized (this) {chatThread.notify();}
+        });
 
-        stopChatButton.addActionListener((ActionEvent event)  -> {});
+        stopChatButton.addActionListener((ActionEvent event)  -> {
+            synchronized (this) {mainFormService.setChatStopped(true);}
+            //synchronized (this) {chatThread.interrupt();}
+        });
 
         chatPanel.setPreferredSize(new Dimension(300,700));
         chatPanel.setLayout(new BorderLayout());
@@ -278,35 +299,50 @@ public class MainForm extends JFrame {
 
         startMailButton.addActionListener((ActionEvent event)  -> {
             JButton source = (JButton) event.getSource();
-            try {
-                String[] massiveOfGirls = ((String) listOfGirls.getSelectedValue()).split(":", 0);
-                java.util.List<JButton> buttons = new LinkedList();
-                for(java.awt.Component comp: mailScrollPanel.getComponents()){
-                    buttons.add((JButton)((JPanel)comp).getComponents()[1]);
-                }
-                buttons.add(source);
-                buttons.add(mailButton);
-                buttons.forEach(button -> button.setEnabled(false));
-                new Thread(()-> {
-                    try {
-                        mainFormService.sendMailMessagesToAllTasks(mailTimer.getValue(),
-                                massiveOfGirls[massiveOfGirls.length-1], buttons);
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }).start();
+            if(mainFormService.isMailWasStopped()){
+                mainFormService.setMailStopped(false);
+                mainFormService.setMailWasStopped(false);
+                pauseMailButton.setEnabled(true);
+                source.setEnabled(false);
             }
-            catch (NullPointerException e){
-                JOptionPane.showMessageDialog(this,"Select a girl",
-                        "Reminder",JOptionPane.INFORMATION_MESSAGE);
+            else {
+                try {
+                    String[] massiveOfGirls = ((String) listOfGirls.getSelectedValue()).split(":", 0);
+                    mainFormService.setChatStopped(false);
+                    java.util.List<JButton> buttons = new LinkedList();
+                    for (java.awt.Component comp : mailScrollPanel.getComponents()) {
+                        buttons.add((JButton) ((JPanel) comp).getComponents()[1]);
+                    }
+                    buttons.add(source);
+                    buttons.add(mailButton);
+                    buttons.forEach(button -> button.setEnabled(false));
+                    mailThread = new Thread(() -> {
+                        try {
+                            mainFormService.sendMailMessagesToAllTasks(mailTimer.getValue(),
+                                    massiveOfGirls[massiveOfGirls.length - 1], buttons);
+                        } catch (InvocationTargetException e) {
+                            e.printStackTrace();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    mailThread.start();
+                } catch (NullPointerException e) {
+                    JOptionPane.showMessageDialog(this, "Select a girl",
+                            "Reminder", JOptionPane.INFORMATION_MESSAGE);
+                }
             }
         });
 
-        pauseChatButton.addActionListener((ActionEvent event)  -> {});
+        pauseChatButton.addActionListener((ActionEvent event)  -> {
+            //synchronized (this) {mainFormService.setMailSuspended(true);}
+            //synchronized (this) {mailThread.notify();}
+        });
 
-        stopChatButton.addActionListener((ActionEvent event)  -> {});
+        stopChatButton.addActionListener((ActionEvent event)  -> {
+            synchronized (this) {mainFormService.setMailStopped(true);}
+            //synchronized (this) {mailThread.interrupt();}
+        });
 
         mailPanel.setPreferredSize(new Dimension(400,700));
         mailPanel.setLayout(new BorderLayout());
@@ -326,7 +362,12 @@ public class MainForm extends JFrame {
         JPanel panel = (JPanel) chatScrollPane.getViewport().getView();
         JPanel innerPanel = new JPanel();
         JProgressBar pb = new JProgressBar(SwingConstants.HORIZONTAL);
-        pb.setString(text.substring(0, 40));
+        if(text.length()>40) {
+            pb.setString(text.substring(0, 40));
+        }
+        else{
+            pb.setString(text);
+        }
         pb.setStringPainted(true);
         innerPanel.add(pb);
         CloseButton closeButton = new CloseButton("✗");
@@ -358,7 +399,12 @@ public class MainForm extends JFrame {
         JPanel panel = (JPanel) mailScrollPane.getViewport().getView();
         JPanel innerPanel = new JPanel();
         JProgressBar pb = new JProgressBar(SwingConstants.HORIZONTAL);
-        pb.setString(text.substring(0, 40));
+        if(text.length()>40) {
+            pb.setString(text.substring(0, 40));
+        }
+        else{
+            pb.setString(text);
+        }
         pb.setStringPainted(true);
         innerPanel.add(pb);
         CloseButton closeButton = new CloseButton("✗");
